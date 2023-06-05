@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./../../style/style.css" />
+    <title>Face Recognition App</title>
+</head>
+<body>
+    <script src="./../component/navbar.js"></script>
+
+    <main>
+        <p class="title">LAPORAN AKSES RUANGAN</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <td>No</td>
+                    <td>Tanggal</td>
+                    <td>Ruangan</td>
+                    <td>User</td>
+                    <td>Status</td>
+                </tr>
+            </thead>
+
+            <tbody></tbody>
+        </table>
+    </main>
+
+    <script>
+        function getReport() {
+            fetch('http://127.0.0.1:3001/attendances')
+                .then(res => res.json())
+                .then(data => {
+                    const result = data.result
+                    console.log(result)
+                    
+                    if (result.length === 0) {
+                        const markup = `
+                            <tr>
+                                <td class="notFound" colspan="5">Data tidak ditemukan.</td>
+                            </tr>
+                        `
+                        document.querySelector('tbody').insertAdjacentHTML('beforeend', markup)
+                    }
+
+                    else {
+                        let i = 1
+    
+                        result.forEach(data => {
+                            const markup = `
+                                <tr id="${i}">
+                                    <td>${i}</td>
+                                    <td>${(data.createdAt).slice(0, 10)}</td>
+                                    <td>${data.room}</td>
+                                    <td>${data.username}</td>
+                                    <td>${data.status}</td>
+                                </tr>
+                                `
+                                document.querySelector('tbody').insertAdjacentHTML('beforeend', markup)
+                                i++
+                        })
+                    }
+                })
+        }
+
+        getReport()
+    </script>
+</body>
+</html>

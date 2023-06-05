@@ -1,0 +1,342 @@
+@font-face {
+    font-family: 'Comfortaa';
+    src: url('../fonts/Comfortaa-Regular.ttf');
+}
+
+@font-face {
+    font-family: 'Comfortaa-Medium';
+    src: url('../fonts/Comfortaa-Medium.ttf');
+}
+
+@font-face {
+    font-family: 'Comfortaa-Bold';
+    src: url('../fonts/Comfortaa-Bold.ttf');
+}
+
+* {
+    --p-green: #2AB29A;
+    --p-green-hover: #0E9B82;
+    --s-grey: #959595;
+    --s-lightgrey: #E5E5E5;
+    --s-red: #B22A2A;
+    --s-red-hover: #9B1111;
+    margin: 0;
+    padding: 0;
+    font-family: 'Comfortaa';
+}
+
+body {
+    display: flex;
+    flex-direction: row;
+}
+
+body.app {
+    margin-top: 100px;
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+}
+
+nav {
+    width: 20%;
+    height: 100vh;
+    padding: 60px 30px;
+    display: flex;
+    flex-direction: column;
+    font-size: 18px;
+    color: var(--p-green);
+    background-color: #FFFFFF;
+    box-shadow: 0 6px 4px 3px var(--s-lightgrey);
+    position: sticky;
+    top: 0;
+    bottom: 0;
+}
+
+nav a {
+    margin-bottom: 40px;
+    transition: 0.2s;
+}
+
+nav a:hover {
+    color: var(--p-green-hover);
+    font-size: 20px;
+}
+
+nav a:first-child {
+    color: inherit;
+    font-size: inherit;
+    cursor: default;
+    font-family: 'Comfortaa-Bold';
+    padding-bottom: 45px;
+    border-bottom: 2px var(--p-green) solid;
+    line-height: 0;
+}
+
+main {
+    width: 80%;
+    padding: 60px 30px;
+}
+
+p.title {
+    width: 100%;
+    font-size: 20px;
+    color: var(--p-green);
+    font-family: 'Comfortaa-Bold';
+    padding-bottom: 45px;
+    border-bottom: 2px var(--p-green) solid;
+    line-height: 0;
+}
+
+h1 {
+    margin: 15px;
+    font-size: 48px;
+    font-family: 'Comfortaa-Bold';
+    color: var(--p-green);
+}
+
+p.info {
+    /* margin-top: 15px; */
+    font-size: 32;
+    color: #000000;
+}
+
+h2 {
+    color: var(--p-green);
+    background-color: #FFFFFF;
+    padding: 20px;
+    border-radius: 4px;
+    box-shadow: 0 0 6px var(--p-green);
+}
+
+h2::before {
+    content: url('./../assets/door.png');
+    padding-right: 10px;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+video {
+    width: 320px;
+    height: 240px;
+    box-shadow: 0 0 10px var(--s-lightgrey);
+}
+
+table {
+    width: 100%;
+    text-align: center;
+    border-collapse: collapse;
+}
+
+thead td {
+    font-family: 'Comfortaa-Bold';
+}
+
+td {
+    padding: 15px 0;
+    border-bottom: 1px var(--p-green) solid;
+}
+
+td img {
+    height: 15px;
+    cursor: pointer;
+    opacity: 0.5;
+}
+
+td img:hover {
+    opacity: 1;
+}
+
+td div {
+    background-color: #FFFFFF;
+    border-bottom: none;
+    box-shadow: 0 0 6px var(--s-lightgrey);
+    position: absolute;
+    z-index: 5;
+    right: 50px;
+    text-align: left;
+    padding: 10px 20px;
+    transition: 0.15s;
+}
+
+td div p {
+    margin: 10px;
+    cursor: pointer;
+}
+
+td div p:hover {
+    color: var(--s-grey);
+}
+
+input.tableInput {
+    width: 50%;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid var(--s-grey);
+    outline: none;
+}
+
+button.tableInput {
+    padding: 10px 40px;
+}
+
+form {
+    margin: 50px;
+    width: 40%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+div.single-form {
+    margin: 30px 0;
+    height: fit-content;
+    flex-direction: row;
+}
+
+div.single-form input {
+    padding: 15px;
+}
+
+div.single-form input:first-child {
+    width: 280px;
+    margin-right: 10px;
+    border-radius: 4px;
+    border: 1px solid var(--s-grey);
+    outline: none;
+}
+
+form input {
+    padding: 15px;
+    border-radius: 4px;
+    border: var(--s-grey) solid 1px;
+    outline: none;
+}
+
+form input[type='text'], form input[type='password'] {
+    margin-bottom: 15px;
+}
+
+form input[type='submit'] {
+    margin-top: 15px;
+}
+
+.room-container {
+    width: 50%;
+    max-width: 600px;
+    margin-top: 50px;
+    display: grid;
+    grid-template-columns: auto auto;
+}
+
+.room-container div {
+    margin: 10px;
+    padding: 15px;
+    text-align: justify;
+    display: flex;
+    justify-content: space-between;
+}
+
+.room-container div a.info::before {
+    content: url('./../assets/user.png');
+    margin-right: 5px;
+}
+
+.content {
+    width: 50%;
+    margin-top: 40px;
+    display: flex;
+    justify-content: center;
+}
+
+.cam-container {
+    width: 320px;
+    margin-right: 30px;
+}
+
+.att-container {
+    width: calc(100% - 320px);
+    max-width: 400px;
+    margin-left: 30px;
+}
+
+.att-container div {
+    height: 240px;
+    padding: 2px 20px;
+    box-shadow: 0 0 10px var(--s-lightgrey);
+    text-align: justify;
+}
+
+.cam-container > p, .att-container > p {
+    margin-bottom: 20px;
+}
+
+.cam-container button, .att-container button {
+    width: 100%;
+    padding: 15px;
+    margin-top: 30px;
+}
+
+/* ROOM'S NAME */
+
+/* NAVBAR */
+
+/* WEBCAM */
+
+/* TABLE */
+
+/* FORM INPUT */
+
+/* BUTTONS */
+.btn {
+    color: #FFFFFF;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btnGreen {
+    background-color: var(--p-green);
+}
+
+.btnGreen:hover {
+    background-color: var(--p-green-hover);
+}
+
+.btnWhite {
+    color: var(--p-green);
+    background-color: #FFFFFF;
+    border: var(--p-green) solid 1px;
+}
+
+.btnWhite:hover {
+    background-color: var(--s-lightgrey);
+}
+
+.btnRed {
+    background-color: var(--s-red);
+}
+
+.btnRed:hover {
+    background-color: var(--s-red-hover);
+}
+
+.show {
+    display: inherit;
+}
+
+.hide {
+    display: none;
+}
+
+tbody tr.noEdit {
+    background-color: var(--s-lightgrey);
+    opacity: 0.3;
+    user-select: none;
+}
+
+tbody tr td.notFound {
+    background-color: var(--s-lightgrey);
+}

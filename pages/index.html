@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./../style/style.css" />
+    <title>Face Recognition App</title>
+</head>
+<body class="app">
+    <h1>Aplikasi Face Recognition</h1>
+    <p class="info">Silahkan pilih ruangan yang dituju</p>
+
+    <div class="room-container">
+        <!-- <div class="btn btnGreen">
+            <a href="/pages/room.html">Ruang 001</a>
+            <a class="info">0</a>
+        </div>
+
+        <div class="btn btnWhite">
+            <a href="/pages/room.html">Ruang 002</a>
+            <a class="info">0</a>
+        </div>
+
+        <div class="btn btnGreen">
+            <a href="/pages/room.html">Ruang 003</a>
+            <a class="info">0</a>
+        </div>
+
+        <div class="btn btnWhite">
+            <a href="/pages/room.html">Ruang 004</a>
+            <a class="info">0</a>
+        </div>
+
+        <div class="btn btnGreen">
+            <a href="/pages/room.html">Ruang 005</a>
+            <a class="info">0</a>
+        </div> -->
+    </div>
+
+    <script>
+        fetch(`http://127.0.0.1:3001/rooms`)
+            .then(res => res.json())
+            .then(data => {
+                const result = data.result
+
+                if (result.length === 0) {
+                    document.querySelector('div.room-container').insertAdjacentHTML('beforebegin', `Data ruangan tidak tersedia.`)
+                }
+
+                else {
+                    let i = 1
+
+                    result.forEach(room => {
+                        const markup = `
+                        <div class="${i % 2 == 0 ? 'btn btnWhite' : 'btn btnGreen'}">
+                            <a href="/pages/room.html?id=${room.id}">${room.name}</a>
+                            <a class="info">0</a>
+                        </div>
+                        `
+                        document.querySelector('div.room-container').insertAdjacentHTML('beforeend', markup)
+                        i++
+                    })
+                }
+            })
+            .catch(err => {
+                console.log(err)
+                document.querySelector('div.room-container').insertAdjacentHTML('beforebegin', `Data ruangan tidak tersedia.`)
+            })
+    </script>
+</body>
+</html>

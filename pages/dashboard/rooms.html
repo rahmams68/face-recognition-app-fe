@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./../../style/style.css" />
+    <title>Face Recognition App</title>
+</head>
+<body>
+    <script src="./../component/navbar.js"></script>
+
+    <main>
+        <p class="title">DATA RUANGAN</p>
+
+        <div class="single-form">
+            <input type="text" placeholder="Masukkan nama ruangan baru . . ."/>
+            <input class="btn btnGreen" type="submit" value="Tambah Data" onclick="addRoom()"/>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <td>No</td>
+                    <td>Nama</td>
+                    <td>Terakhir Edit</td>
+                    <td></td>
+                </tr>
+            </thead>
+
+            <tbody></tbody>
+        </table>
+    </main>
+
+    <script>
+        function getRooms() {
+            fetch(`http://127.0.0.1:3001/rooms`)
+                .then(res => res.json())
+                .then(data => {
+                    const result = data.result
+
+                    if (result.length === 0) {
+                        const markup = `
+                            <tr>
+                                <td class="notFound" colspan="4">Data tidak ditemukan.</td>
+                            </tr>
+                        `
+                        document.querySelector('tbody').insertAdjacentHTML('beforeend', markup)
+                    }
+
+                    else {
+                        let i = 1
+    
+                        result.forEach(room => {
+                            const markup = `
+                                <tr id="${i}">
+                                    <td>${i}</td>
+                                    <td>${room.name}</td>
+                                    <td>${(room.createdAt).slice(0, 10)}</td>
+                                    <td>
+                                        <img onclick="popup(${i})" src="./../../assets/icon-settings.svg" />
+                                        <div class='hide'>
+                                            <p onclick="editRoom(${i}, ${room.id})">Edit</p>
+                                            <p>Tambah Penerima Akses</p>
+                                            <p onclick="deleteRoom(${room.id})">Hapus</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `
+                            document.querySelector('tbody').insertAdjacentHTML('beforeend', markup)
+                            i++
+                        })
+                    }
+                })
+                .catch(err => {
+                    console.log(err)
+                    const markup = `
+                            <tr>
+                                <td class="notFound" colspan="4">Data tidak ditemukan.</td>
+                            </tr>
+                        `
+                        document.querySelector('tbody').insertAdjacentHTML('beforeend', markup)
+                })
+        }
+
+        function popup(row_id) {
+            const element = document.getElementById(row_id).querySelector('div')
+            element.classList[0] == 'hide' ? element.setAttribute('class', 'show') : element.setAttribute('class', 'hide')
+        }
+
+        function addRoom() {
+            const name = document.querySelector('input').value
+
+            if (!name) {
+                alert('Silahkan input nama ruangan baru!')
+            }
+
+            else {
+                fetch('http://127.0.0.1:3001/rooms', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name })
+                })
+                .then(res => res.ok ? window.location.reload() : console.log('Error'))
+                .catch(err => console.log(err))                
+            }
+        }
+
+        function editRoom(row_id, rid) {
+            const tr = document.querySelectorAll('tr')
+            
+            for (let i = 1; i < tr.length; i++) {
+                if (i !== row_id) {
+                    tr[i].setAttribute('class', 'noEdit')
+                }
+            }
+            
+            const element = document.getElementById(row_id)
+
+            element.innerHTML = `
+                <tr>
+                    <td>${row_id}</td>
+                    <td><input name="nameInput" type="text" placeholder="" class="tableInput"/></td>
+                    <td><button class="btn btnGreen tableInput" onclick="updateRoom(${rid})">Simpan</button</td>
+                    <td><button class="btn btnRed tableInput" onclick="window.location.reload()">Batal</button</td>
+                    <td></td>
+                </tr>
+            `
+        }
+
+        function updateRoom(rid) {
+            const name = document.getElementsByName('nameInput')[0].value
+
+            fetch(`http://127.0.0.1:3001/rooms/${rid}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name })
+            })
+            .then(res => res.ok ? window.location.reload() : console.log('Error'))
+            .catch(err => console.log(err))
+        }
+
+        function deleteRoom(rid) {
+             if (confirm('Hapus data ini?')) {
+                 fetch(`http://127.0.0.1:3001/rooms/${rid}`, { method: 'DELETE' })
+                     .then(res => res.ok ? window.location.reload() : console.log('Error'))
+                     .catch(err => console.log(err))
+             }
+        }
+
+        getRooms()
+    </script>
+</body>
+</html>
