@@ -23,7 +23,7 @@
                 <tr>
                     <td>No</td>
                     <td>Nama</td>
-                    <td>Status Data Training</td>
+                    <td>Status Data</td>
                     <td>Terakhir Edit</td>
                     <td></td>
                 </tr>
@@ -63,7 +63,7 @@
                                         <img onclick="popup(${i})" src="./../../assets/icon-settings.svg" />
                                         <div class='hide'>
                                             <p onclick="editUser(${i}, ${user.id})">Edit<p>
-                                            <p>Input Data Training</p>
+                                            <a href='/pages/dashboard/input-training-data.html?u=${user.name}&i=${user.id}'><p>Input Data Training</p></a>
                                             <p onclick="deleteUser(${user.id})">Hapus</p>
                                         </div>
                                     </td>

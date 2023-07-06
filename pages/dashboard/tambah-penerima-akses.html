@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./../../style/style.css" />
+    <title>Face Recognition App</title>
+</head>
+<body>
+    <script src="./../component/navbar.js"></script>
+
+    <main>
+        <p class="title">DAFTAR PENERIMA AKSES: <span></span></p>
+
+        <div class="single-form">
+            <select id="user-select" name="users">
+                <option id="0" value="">-- Pilih user penerima akses --</option>
+            </select>
+            <input id="tambah-akses" class="btn btnGreen" type="submit" value="Tambah Akses" onclick="addPermission()"/>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <td>No</td>
+                    <td>Nama</td>
+                    <td>Tanggal Ditambahkan</td>
+                    <td></td>
+                </tr>
+            </thead>
+
+            <tbody></tbody>
+        </table>
+    </main>
+
+    <script>
+        window.onload = function() {
+            try {
+                var url_string = (window.location.href)
+                var url = new URL(url_string)
+                var rname = url.searchParams.get('r')
+                var rid = url.searchParams.get('i')
+                
+                document.querySelector('span').innerText = rname
+
+                const btn = document.getElementById('tambah-akses')
+                btn.setAttribute('onclick', `addPermission(${rid})`)
+                getPermissions(rid)
+            } catch(err) {
+                console.log(err)
+            }
+        }
+
+        function getUsers() {
+            fetch('http://127.0.0.1:3001/users')
+                .then(res => res.json())
+                .then(data => {
+                    const result = data.result
+                    
+                    if (result.length === 0) {
+                        const markup = `<option></option>`
+                        document.querySelector('select').insertAdjacentHTML('beforeend', markup)
+                    }
+
+                    else {
+                        result.forEach(user => {
+                            const markup = `<option id="${user.id}"" value="${user.name}">${user.name}</option>`
+                            document.querySelector('select').insertAdjacentHTML('beforeend', markup)
+                        })
+                    }
+                })
+        }
+
+        function getPermissions(rid) {
+            // fetch(`http://127.0.0.1:3001/permissions/${rid}`)
+            fetch(`http://127.0.0.1:3001/permissions/${rid}`)
+                .then(res => res.json())
+                .then(data => {
+                    const result = data.result
+
+                    if (result.length === 0) {
+                        const markup = `
+                            <tr>
+                                <td class="notFound" colspan="4">Data tidak ditemukan.</td>
+                            </tr>
+                        `
+                        document.querySelector('tbody').insertAdjacentHTML('beforeend', markup)
+                    }
+
+                    else {
+                        let i = 1
+    
+                        result.forEach(user => {
+                            const markup = `
+                                <tr id="${i}">
+                                    <td>${i}</td>
+                                    <td>${user.user_name.name}</td>
+                                    <td>${(user.createdAt).slice(0, 10)}</td>
+                                    <td>
+                                        <img onclick="deletePermission(${user.id})" src="./../../assets/icon-settings.svg" />
+                                    </td>
+                                </tr>
+                            `
+                            document.querySelector('tbody').insertAdjacentHTML('beforeend', markup)
+                            i++
+                        })
+                    }
+                })
+                .catch(err => {
+                    console.log(err)
+                    const markup = `
+                            <tr>
+                                <td class="notFound" colspan="4">Data tidak ditemukan.</td>
+                            </tr>
+                        `
+                        document.querySelector('tbody').insertAdjacentHTML('beforeend', markup)
+                })
+        }
+
+        function addPermission(room_id) {
+            const user_id = document.querySelector('select').selectedOptions[0].id
+            // const id = user_id[0].id
+            // console.log(rid)
+
+            
+            if (user_id != 0) {
+                fetch('http://127.0.0.1:3001/permissions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id, room_id })
+                })
+                .then(res => res.ok ? window.location.reload() : console.log('Error'))
+                .catch(err => console.log(err))                
+            }
+
+            else {
+                alert('Silahkan pilih user penerima akses terlebih dahulu!')
+            }
+        }
+
+        function deletePermission(rid) {
+             if (confirm('Hapus data ini?')) {
+                 fetch(`http://127.0.0.1:3001/permissions/${rid}`, { method: 'DELETE' })
+                     .then(res => res.ok ? window.location.reload() : console.log('Error'))
+                     .catch(err => console.log(err))
+             }
+        }
+
+        getUsers()
+        // getPermissions()
+    </script>
+</body>
+</html>

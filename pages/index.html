@@ -11,32 +11,7 @@
     <h1>Aplikasi Face Recognition</h1>
     <p class="info">Silahkan pilih ruangan yang dituju</p>
 
-    <div class="room-container">
-        <!-- <div class="btn btnGreen">
-            <a href="/pages/room.html">Ruang 001</a>
-            <a class="info">0</a>
-        </div>
-
-        <div class="btn btnWhite">
-            <a href="/pages/room.html">Ruang 002</a>
-            <a class="info">0</a>
-        </div>
-
-        <div class="btn btnGreen">
-            <a href="/pages/room.html">Ruang 003</a>
-            <a class="info">0</a>
-        </div>
-
-        <div class="btn btnWhite">
-            <a href="/pages/room.html">Ruang 004</a>
-            <a class="info">0</a>
-        </div>
-
-        <div class="btn btnGreen">
-            <a href="/pages/room.html">Ruang 005</a>
-            <a class="info">0</a>
-        </div> -->
-    </div>
+    <div class="room-container"></div>
 
     <script>
         fetch(`http://127.0.0.1:3001/rooms`)
@@ -54,7 +29,7 @@
                     result.forEach(room => {
                         const markup = `
                         <div class="${i % 2 == 0 ? 'btn btnWhite' : 'btn btnGreen'}">
-                            <a href="/pages/room.html?id=${room.id}">${room.name}</a>
+                            <a href="/pages/room.html?id=${room.id}&name=${room.name}">${room.name}</a>
                             <a class="info">0</a>
                         </div>
                         `

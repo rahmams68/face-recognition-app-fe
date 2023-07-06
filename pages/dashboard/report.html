@@ -30,7 +30,7 @@
 
     <script>
         function getReport() {
-            fetch('http://127.0.0.1:3001/attendances')
+            fetch('http://127.0.0.1:3001/attendance')
                 .then(res => res.json())
                 .then(data => {
                     const result = data.result

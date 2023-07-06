@@ -35,6 +35,7 @@ body.app {
     flex-direction: column;
     text-align: center;
     align-items: center;
+    box-sizing: border-box;
 }
 
 nav {
@@ -100,7 +101,12 @@ p.info {
     color: #000000;
 }
 
+p span {
+    color: var(--s-grey);
+}
+
 h2 {
+    min-width: 400px;
     color: var(--p-green);
     background-color: #FFFFFF;
     padding: 20px;
@@ -118,10 +124,23 @@ a {
     color: inherit;
 }
 
+.video-container {
+    position: relative;
+}
+
 video {
     width: 320px;
     height: 240px;
+    border-radius: 4px;
     box-shadow: 0 0 10px var(--s-lightgrey);
+}
+
+canvas {
+    width: 320px;
+    height: 240px;
+    border-radius: 4px;
+    position: absolute;
+    left: 0;
 }
 
 table {
@@ -196,7 +215,7 @@ div.single-form {
     flex-direction: row;
 }
 
-div.single-form input {
+div.single-form input, div.single-form select {
     padding: 15px;
 }
 
@@ -208,7 +227,19 @@ div.single-form input:first-child {
     outline: none;
 }
 
-form input {
+div.single-form select {
+    margin-right: 10px;
+    background-color: #FFFFFF;
+    border-radius: 4px;
+    border: 1px solid var(--s-grey);
+    outline: none;
+}
+
+div.single-form select option:first-child {
+    color: var(--s-grey);
+}
+
+form input, form button {
     padding: 15px;
     border-radius: 4px;
     border: var(--s-grey) solid 1px;
@@ -219,7 +250,7 @@ form input[type='text'], form input[type='password'] {
     margin-bottom: 15px;
 }
 
-form input[type='submit'] {
+form button {
     margin-top: 15px;
 }
 
@@ -263,8 +294,8 @@ form input[type='submit'] {
 }
 
 .att-container div {
-    height: 240px;
-    padding: 2px 20px;
+    height: calc(240px - 40px);
+    padding: 20px;
     box-shadow: 0 0 10px var(--s-lightgrey);
     text-align: justify;
 }
@@ -273,10 +304,48 @@ form input[type='submit'] {
     margin-bottom: 20px;
 }
 
-.cam-container button, .att-container button {
+.att-container div p {
+    line-height: 30px;
+}
+
+.prev-container {
+    width: calc(100% - 320px);
+}
+
+.prev-container div {
+    box-sizing: border-box;
+    box-shadow: 0 0 10px var(--s-lightgrey);
+    height: 240px;
+    margin-bottom: 3px;
+}
+
+.cam-container button, .att-container button, .prev-container button {
     width: 100%;
     padding: 15px;
     margin-top: 30px;
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+    margin-top: 40px;
+}
+
+div.img-container {
+    display: grid;
+    grid-template-columns: 22% 22% 22% 22%;
+    padding: 20px;
+    gap: 15px 20px;
+    overflow: auto;
+}
+
+div.img-container img {
+    height: 100px;
+}
+
+div.img-container img:hover {
+    opacity: 0.5;
+    cursor: pointer;
 }
 
 /* ROOM'S NAME */
@@ -321,6 +390,13 @@ form input[type='submit'] {
 
 .btnRed:hover {
     background-color: var(--s-red-hover);
+}
+
+.btnDisable {
+    background-color: var(--s-grey);
+    user-select: none;
+    opacity: 0.3;
+    border: none;
 }
 
 .show {

@@ -13,8 +13,11 @@
     <div class="content">
         <div class="cam-container">
             <p>Senin, 26 Februari 2023</p>
-            <video id="cam" playsinline autoplay muted></video>
-            <button onclick="startCam()" class="btn btnGreen">Masuk</button>
+            <div class="video-container">
+                <video id="cam" width="320" height="240" playsinline autoplay muted></video>
+                <canvas id="detectionCanvas"  width="320" height="240"></canvas>
+            </div>
+            <button onclick="enterRoom()" class="btn btnGreen">Masuk</button>
         </div>
 
         <div class="att-container">
@@ -24,10 +27,23 @@
                 <p>User 002 07:30:16</p>
                 <p>User 003 07:30:16</p>
             </div>
-            <button class="btn btnRed">Keluar</button>
+            <button onclick="exitRoom()" class="btn btnRed">Keluar</button>
         </div>
     </div>
 
+    <script>
+        window.onload = function() {
+            try {
+                var url_string = (window.location.href)
+                var url = new URL(url_string)
+                var rname = url.searchParams.get('name')
+                
+                const element = document.querySelector('h2').innerText = rname + ' (Sample Room)'
+            } catch(err) {
+                console.log(err)
+            }
+        }
+    </script>
     <script defer src="./../script/face-api.js"></script>
     <script defer src="./../script/app-script.js"></script>
 </body>
