@@ -8,11 +8,11 @@
     <title>Face Recognition App</title>
 </head>
 <body class="app">
-    <h2>Ruang 001 (Ruang Direktur)</h2>
+    <h2></h2>
 
     <div class="content">
         <div class="cam-container">
-            <p>Senin, 26 Februari 2023</p>
+            <p id="date">Senin, 26 Februari 2023</p>
             <div class="video-container">
                 <video id="cam" width="320" height="240" playsinline autoplay muted></video>
                 <canvas id="detectionCanvas"  width="320" height="240"></canvas>
@@ -23,9 +23,7 @@
         <div class="att-container">
             <p>Daftar Kehadiran</p>
             <div>
-                <p>User 001 07:30:16</p>
-                <p>User 002 07:30:16</p>
-                <p>User 003 07:30:16</p>
+                <ul id="att-list"></ul>
             </div>
             <button onclick="exitRoom()" class="btn btnRed">Keluar</button>
         </div>
@@ -34,11 +32,17 @@
     <script>
         window.onload = function() {
             try {
+                const day = ['Senin', 'Selasa', 'Rabu', 'Kamis', "Jum'at", 'Sabtu', 'Minggu']
+                const month = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']
+
                 var url_string = (window.location.href)
                 var url = new URL(url_string)
                 var rname = url.searchParams.get('name')
                 
-                const element = document.querySelector('h2').innerText = rname + ' (Sample Room)'
+                const element = document.querySelector('h2').innerText = rname //+ ' (Sample Room)'
+
+                const date = new Date()
+                document.getElementById('date').innerText = day[date.getDay() - 1] + ', ' + date.getDate() + ' ' + month[date.getMonth() - 1] + ' ' + date.getFullYear()
             } catch(err) {
                 console.log(err)
             }

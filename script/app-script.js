@@ -17,7 +17,7 @@ async function loadModel() {
 
 async function init() {
     await loadModel()
-    startCam()
+    // startCam()
     getDescriptors()
     getRoomAttendances()
     // console.log(faceapi.nets)
@@ -118,9 +118,9 @@ async function getDescriptors() {
                         ls.push(res.l)
                         ds.push(res.d)
                     })
-                    // results = data.result
-                    console.log(ls)
-                    console.log(ds)
+
+                    // console.log(ls)
+                    // console.log(ds)
 
                     // results.forEach(desc => {
                         // LabeledFaceDescriptors.push(desc.descriptor)
@@ -142,43 +142,26 @@ async function getDescriptors() {
 }
 
 async function getRoomAttendances() {
+    const list = document.getElementById('att-list')
+
     const url_string = (window.location.href)
     const url = new URL(url_string)
     const rid = url.searchParams.get('id')
-    console.log(rid)
 
     fetch(`http://127.0.0.1:3001/attendance/${rid}`)
         .then(res => res.json())
         .then(data => {
             const result = data.result
-            console.log(result)
-            
-            // if (result.length === 0) {
-            //     const markup = `
-            //         <tr>
-            //             <td class="notFound" colspan="5">Data tidak ditemukan.</td>
-            //         </tr>
-            //     `
-            //     document.querySelector('tbody').insertAdjacentHTML('beforeend', markup)
-            // }
 
-            // else {
-            //     let i = 1
-
-            //     result.forEach(data => {
-            //         const markup = `
-            //             <tr id="${i}">
-            //                 <td>${i}</td>
-            //                 <td>${(data.createdAt).slice(0, 10)}</td>
-            //                 <td>${data.room_name.name}</td>
-            //                 <td>${data.user_name.name}</td>
-            //                 <td>${data.status ? 'Masuk' : 'Keluar'}</td>
-            //             </tr>
-            //             `
-            //             document.querySelector('tbody').insertAdjacentHTML('beforeend', markup)
-            //             i++
-            //     })
-            // }
+            if (result.length !== 0) {
+                result.forEach(data => {
+                    const markup = `
+                        <li>${data.username}</li>
+                        <li>${(data.date).slice(0, 10)} ${data.status ? "<span class='green'>>></span>" : "<span class='red'><<</span>"}</li>
+                    `
+                    list.insertAdjacentHTML('beforeend', markup)
+                })
+            }
         })
 }
 
