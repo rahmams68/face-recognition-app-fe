@@ -19,6 +19,7 @@ async function init() {
     await loadModel()
     startCam()
     getDescriptors()
+    getRoomAttendances()
     // console.log(faceapi.nets)
 
     //deteksi sekali di sini, supaya nanti nggak lama (tapi kalau bisa di halaman aval sih)
@@ -47,7 +48,7 @@ function euclideanDistance(face1, face2) {
     }
 
     distance **= 0.5
-    console.log(distance)
+    // console.log(distance)
 
     return distance
 }
@@ -68,11 +69,14 @@ function faceMatcher(face) {
     const index = results.indexOf(min)
 
     if (min > threshold) {
-        console.log('User tidak dikenal.')
+        let message = 'User tidak dikenal.'
+        return message
     }
 
     else {
-        console.log(ls[index])
+        console.log(ls[index].l)
+        console.log(ls[index].i)
+        return ls[index]
     }
 }
 
@@ -137,6 +141,65 @@ async function getDescriptors() {
         } catch(err) {console.log(err)}
 }
 
+async function getRoomAttendances() {
+    const url_string = (window.location.href)
+    const url = new URL(url_string)
+    const rid = url.searchParams.get('id')
+    console.log(rid)
+
+    fetch(`http://127.0.0.1:3001/attendance/${rid}`)
+        .then(res => res.json())
+        .then(data => {
+            const result = data.result
+            console.log(result)
+            
+            // if (result.length === 0) {
+            //     const markup = `
+            //         <tr>
+            //             <td class="notFound" colspan="5">Data tidak ditemukan.</td>
+            //         </tr>
+            //     `
+            //     document.querySelector('tbody').insertAdjacentHTML('beforeend', markup)
+            // }
+
+            // else {
+            //     let i = 1
+
+            //     result.forEach(data => {
+            //         const markup = `
+            //             <tr id="${i}">
+            //                 <td>${i}</td>
+            //                 <td>${(data.createdAt).slice(0, 10)}</td>
+            //                 <td>${data.room_name.name}</td>
+            //                 <td>${data.user_name.name}</td>
+            //                 <td>${data.status ? 'Masuk' : 'Keluar'}</td>
+            //             </tr>
+            //             `
+            //             document.querySelector('tbody').insertAdjacentHTML('beforeend', markup)
+            //             i++
+            //     })
+            // }
+        })
+}
+
+function recordAttendance(uid, status) {
+    const url_string = (window.location.href)
+    const url = new URL(url_string)
+    const rid = url.searchParams.get('id')
+
+    fetch('http://127.0.0.1:3001/attendance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: uid, room_id: rid, status })
+    })
+    .then(res => res.ok ? res.json() : console.log('Error'))
+    .then(data => {
+        console.log(data)
+    })
+    // .then(res => res.ok ? window.location.reload() : console.log('Error'))
+    .catch(err => console.log(err))
+}
+
 async function enterRoom() {
     console.log('Masuk')
     
@@ -147,13 +210,8 @@ async function enterRoom() {
     const image = document.createElement('img')
     image.src = dataUrl
 
-    // const displaySize = { width: v_width, height: v_height }
-
     const detection = await faceapi.detectAllFaces(image).withFaceLandmarks().withFaceDescriptors()
-    // const detections = await faceapi.detectAllFaces(image).withFaceLandmarks().withFaceDescriptors()
-    // const resizedDetection = faceapi.resizeResults(detection, displaySize)
 
-    // console.log(detection)
     if (!detection[0]) {
         console.log('Tidak ada wajah terdeteksi.')
     }
@@ -162,17 +220,47 @@ async function enterRoom() {
         // ctx.strokeStyle = 'green'
         // ctx.strokeRect(detections[0].alignedRect._box._x, detections[0].alignedRect._box._y, detections[0].alignedRect._box._width, detections[0].alignedRect._box._height)
         
-        // console.log('CURRENT DETECTION: ', detection[0].descriptor)
-        faceMatcher(detection[0].descriptor)
+        let result = faceMatcher(detection[0].descriptor)
+        
+        if (typeof(result) === 'string') {
+            console.log(result)
+        }
+
+        else {
+            console.log(result)
+            recordAttendance(result.i, true)
+        }
     }
 
-
-    // console.log(LabeledFaceDescriptors)
-    // console.log(LabeledFaceDescriptors[0].__defineGetter__().toString())
     // let faceMatcher = new faceapi.FaceMatcher(LabeledFaceDescriptors, 0.6)
-    // console.log(faceMatcher)
 }
 
-function exitRoom() {
+async function exitRoom() {
     console.log('Keluar')
+
+    ctx.drawImage(video, 0, 0)
+    const dataUrl = canvas.toDataURL('image/png')
+    ctx.clearRect(0, 0, v_width, v_height)
+
+    const image = document.createElement('img')
+    image.src = dataUrl
+
+    const detection = await faceapi.detectAllFaces(image).withFaceLandmarks().withFaceDescriptors()
+
+    if (!detection[0]) {
+        console.log('Tidak ada wajah terdeteksi.')
+    }
+
+    else {
+        let result = faceMatcher(detection[0].descriptor)
+        
+        if (typeof(result) === 'string') {
+            console.log(result)
+        }
+
+        else {
+            console.log(result)
+            recordAttendance(result.i, false)
+        }
+    }
 }

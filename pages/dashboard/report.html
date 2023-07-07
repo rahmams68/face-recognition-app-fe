@@ -34,7 +34,7 @@
                 .then(res => res.json())
                 .then(data => {
                     const result = data.result
-                    console.log(result)
+                    // console.log(result)
                     
                     if (result.length === 0) {
                         const markup = `
@@ -53,9 +53,9 @@
                                 <tr id="${i}">
                                     <td>${i}</td>
                                     <td>${(data.createdAt).slice(0, 10)}</td>
-                                    <td>${data.room}</td>
-                                    <td>${data.username}</td>
-                                    <td>${data.status}</td>
+                                    <td>${data.room_name.name}</td>
+                                    <td>${data.user_name.name}</td>
+                                    <td>${data.status ? 'Masuk' : 'Keluar'}</td>
                                 </tr>
                                 `
                                 document.querySelector('tbody').insertAdjacentHTML('beforeend', markup)
