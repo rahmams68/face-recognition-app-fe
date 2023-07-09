@@ -19,21 +19,32 @@ async function init() {
     await loadModel()
     // startCam()
     getDescriptors()
-    getRoomAttendances()
+    // getRoomAttendances()
     // console.log(faceapi.nets)
 
     //deteksi sekali di sini, supaya nanti nggak lama (tapi kalau bisa di halaman aval sih)
     //selama proses init beri pop up loading
 }
 
+async function initCam() {
+    video = document.getElementById('cam')
+    canvas = document.getElementById('detectionCanvas')
+    ctx = canvas.getContext('2d')
+    v_width = video.width
+    v_height = video.height
+
+    startCam()
+    getRoomAttendances()
+}
+
 init()
 
 // Define variables
-const video = document.getElementById('cam')
-const canvas = document.getElementById('detectionCanvas')
-const ctx = canvas.getContext('2d')
-const v_width = video.width
-const v_height = video.height
+let video
+let canvas
+let ctx
+let v_width
+let v_height
 
 function euclideanDistance(face1, face2) {
     let distance = 0
@@ -95,19 +106,19 @@ function handleSuccess(stream) {
     cam.srcObject = stream
 }
 
-video.addEventListener('play', () => {
-    // console.log('Play')
+// video.addEventListener('play', () => {
+//     // console.log('Play')
     
-    // setInterval(async () => {
-    //     const detections = await faceapi.detectAllFaces(video)
+//     // setInterval(async () => {
+//     //     const detections = await faceapi.detectAllFaces(video)
 
-    //     ctx.clearRect(0, 0, canvas.width, canvas.height)
-    //     if (detections[0] !== undefined) {
-    //         ctx.strokeStyle = 'green'
-    //         ctx.strokeRect(detections[0]._box._x, detections[0]._box._y, detections[0]._box._width, detections[0]._box._height)
-    //     }
-    // }, 100)
-})
+//     //     ctx.clearRect(0, 0, canvas.width, canvas.height)
+//     //     if (detections[0] !== undefined) {
+//     //         ctx.strokeStyle = 'green'
+//     //         ctx.strokeRect(detections[0]._box._x, detections[0]._box._y, detections[0]._box._width, detections[0]._box._height)
+//     //     }
+//     // }, 100)
+// })
 
 async function getDescriptors() {
         try {

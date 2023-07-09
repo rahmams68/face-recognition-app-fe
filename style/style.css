@@ -31,11 +31,15 @@ body {
 }
 
 body.app {
-    margin-top: 100px;
+    margin-top: 80px;
     flex-direction: column;
     text-align: center;
     align-items: center;
     box-sizing: border-box;
+}
+
+body.app section#rooms {
+    width: 50%;
 }
 
 nav {
@@ -255,9 +259,10 @@ form button {
 }
 
 .room-container {
-    width: 50%;
+    width: 80%;
     max-width: 600px;
-    margin-top: 50px;
+    /* margin-top: 50px; */
+    margin: 50px auto 0 auto;
     display: grid;
     grid-template-columns: auto auto;
 }
@@ -276,7 +281,7 @@ form button {
 }
 
 .content {
-    width: 50%;
+    width: 100%;
     height: fit-content;
     margin-top: 50px;
     display: flex;
@@ -293,9 +298,14 @@ form button {
     margin-bottom: 20px;
 }
 
-.content > div > div {
+.content > div > div, .content > div canvas {
     height: 240px;
     box-shadow: 0 0 10px var(--s-lightgrey);
+}
+
+.content > div canvas {
+    width: 100%;
+    position: static;   
 }
 
 .content .att-container div {
@@ -464,4 +474,57 @@ tbody tr.noEdit {
 
 tbody tr td.notFound {
     background-color: var(--s-lightgrey);
+}
+
+.loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #FFFFFF;
+    transition: opacity 0.75s, visibility 0.75s;
+}
+
+.loader-hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.loader::after {
+    content: '';
+    width: 75px;
+    height: 75px;
+    border: 15px solid #DDDDDD;
+    border-top-color: var(--p-green);
+    border-radius: 50%;
+    animation: loading 0.75s ease infinite;
+}
+
+button.back {
+    position: absolute;
+    left: 60px;
+    color:  var(--p-green);
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+button.back:hover {
+    /* color: var(--s-lightgrey); */
+    border-bottom: 1px solid var(--p-green);
+}
+
+@keyframes loading {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }

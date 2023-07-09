@@ -6,42 +6,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./../style/style.css" />
     <title>Face Recognition App</title>
+
+    <script defer src="./../script/face-api.js"></script>
+    <script defer src="./../script/tes-script.js"></script>
+    <!-- <script defer src="./component/room.js"></script> -->
 </head>
-<body class="app">
-    <h1>Aplikasi Face Recognition</h1>
-    <p class="info">Silahkan pilih ruangan yang dituju</p>
+<body class="app" onload="init()">
+    <section id="main">
+        <h1>Aplikasi Face Recognition</h1>
+        <p class="info">Silahkan pilih ruangan yang dituju</p>
 
-    <div class="room-container"></div>
+        <div class="room-container"></div>
+    </section>
 
-    <script>
-        fetch(`http://127.0.0.1:3001/rooms`)
-            .then(res => res.json())
-            .then(data => {
-                const result = data.result
+    <section id="rooms" class="hide">
+        <button id="back" class="back" onclick="backToHome()">< Kembali</button>
+        <h2 id="title"></h2>
 
-                if (result.length === 0) {
-                    document.querySelector('div.room-container').insertAdjacentHTML('beforebegin', `Data ruangan tidak tersedia.`)
-                }
+        <div class="content">
+            <div class="cam-container">
+                <p id="date"></p>
+                <canvas id="detectionCanvas" width="320" height="240"></canvas>
+                <button onclick="enterRoom()" class="btn btnGreen">Masuk</button>
+            </div>
 
-                else {
-                    let i = 1
+            <div class="att-container">
+                <p>Daftar Kehadiran</p>
+                <div>
+                    <ul id="att-list"></ul>
+                </div>
+                <button onclick="exitRoom()" class="btn btnRed">Keluar</button>
+            </div>
+        </div>
+    </section>
 
-                    result.forEach(room => {
-                        const markup = `
-                        <div class="${i % 2 == 0 ? 'btn btnWhite' : 'btn btnGreen'}">
-                            <a href="/pages/room.html?id=${room.id}&name=${room.name}">${room.name}</a>
-                            <a class="info">0</a>
-                        </div>
-                        `
-                        document.querySelector('div.room-container').insertAdjacentHTML('beforeend', markup)
-                        i++
-                    })
-                }
-            })
-            .catch(err => {
-                console.log(err)
-                document.querySelector('div.room-container').insertAdjacentHTML('beforebegin', `Data ruangan tidak tersedia.`)
-            })
-    </script>
+    <div class="loader"></div>
 </body>
 </html>
