@@ -528,3 +528,156 @@ button.back:hover {
         transform: rotate(360deg);
     }
 }
+
+.verificationPopup {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    right: 0;
+    /* background-color: #0E9B8233; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.verificationBox {
+    background-color: #FFFFFF;
+    box-shadow: 0 0 10px var(--s-lightgrey);
+    border-radius: 4px;
+    border: 3px solid var(--p-green);
+    width: 300px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding: 20px;
+}
+
+.appear {
+    animation: appearing 0.5s ease;
+    animation: removing 0.5s ease 1.5s;
+}
+
+@keyframes appearing {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes removing {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+.checklist {
+    margin: 0 auto;
+    width: 100px;
+    height: 100px;
+    border: 1px solid var(--p-green);
+    border-radius: 100%;
+    position: relative;
+    animation: circle 1s ease;
+    transition: 0.3s;
+    animation-delay: 0.1s;
+}
+
+.checklist::after {
+    position: absolute;
+    content: '';
+    width: 30px;
+    height: 50px;
+    top: 14px;
+    left: 32px;
+    border-bottom: 10px solid var(--p-green);
+    border-right: 10px solid var(--p-green);
+    border-radius: 8px;
+    transform: rotate(40deg);
+}
+
+.not {
+    margin: 0 auto;
+    width: 100px;
+    height: 100px;
+    border: 1px solid var(--s-red);
+    border-radius: 100%;
+    position: relative;
+    animation: redCircle 1s ease;
+    transition: 0.3s;
+    animation-delay: 0.1s;
+}
+
+.not::before {
+    position: absolute;
+    content: '';
+    width: 10px;
+    height: 60px;
+    top: 20px;
+    left: 45px;
+    background-color: var(--s-red);
+    transform: rotate(45deg);
+}
+
+.not::after {
+    position: absolute;
+    content: '';
+    width: 10px;
+    height: 60px;
+    top: 20px;
+    left: 45px;
+    background-color: var(--s-red);
+    transform: rotate(-45deg);
+}
+
+@keyframes circle {
+    0% {
+        border-color: #FFFFFF;
+    }
+
+    25% {
+        border-right-color: var(--p-green);
+    }
+
+    50% {
+        border-bottom-color: var(--p-green);
+    }
+
+    75% {
+        border-left-color: var(--p-green);
+    }
+
+    100% {
+        border-top-color: var(--p-green);
+    }
+}
+
+@keyframes redCircle {
+    0% {
+        border-color: #FFFFFF;
+    }
+
+    25% {
+        border-right-color: var(--s-red);
+    }
+
+    50% {
+        border-bottom-color: var(--s-red);
+    }
+
+    75% {
+        border-left-color: var(--s-red);
+    }
+
+    100% {
+        border-top-color: var(--s-red);
+    }
+}

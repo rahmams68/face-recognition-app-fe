@@ -111,7 +111,7 @@ async function getDescriptors() {
     } catch(err) {console.log(err)}
 }
 
-function recordAttendance(uid, status) {
+function recordAttendance(uid, v_name, status) {
     const rid = localStorage.getItem('currRid')
 
     fetch('http://127.0.0.1:3001/attendance', {
@@ -122,6 +122,11 @@ function recordAttendance(uid, status) {
     .then(res => res.ok ? res.json() : console.log('Error'))
     .then(data => {
         console.log(data)
+        data.message === 'Akses diizinkan.' ? verificationPopup(v_name, true) : verificationPopup(v_name, false)
+        
+        const ul = document.querySelector('ul')
+        ul.innerHTML = ''
+        getRoomAttendances()
     })
     // .then(res => res.ok ? window.location.reload() : console.log('Error'))
     .catch(err => console.log(err))
@@ -194,6 +199,47 @@ function displayRoom(rid, rname) {
     container.removeAttribute('class')
 }
 
+function verificationPopup(name='Wajah tidak dikenal.', status) {
+    let div = document.createElement('div')
+    div.setAttribute('id', 'verificationPopup')
+    div.setAttribute('class', 'verificationPopup')
+
+    let markup = `
+        <div class="verificationBox appear">
+            <p>${status ? 'Verifikasi berhasil!' : 'Akses tidak diizinkan!'}</p>
+            <div class=${status ? 'checklist' : 'not'}></div>
+            <p>${name}</p>
+        </div>
+    `
+
+    // if (status) {
+    //     markup = `
+    //         <div class="verificationBox appear">
+    //             <p>Verifikasi berhasil!</p>
+    //             <div class="checklist"></div>
+    //             <p>${name}</p>
+    //         </div>
+    //     `
+    // }
+
+    // else {
+    //     markup = `
+    //         <div class="verificationBox appear">
+    //             <p>Akses tidak diizinkan!</p>
+    //             <div class="not"></div>
+    //             <p>Wajah tidak dikenal.</p>
+    //         </div>
+    //     `
+    // }
+
+    div.innerHTML = markup
+    document.body.appendChild(div)
+    
+    setTimeout(() => {
+        document.getElementById('verificationPopup').remove()
+    }, 2000)
+}
+
 async function enterRoom() {
     console.log('Masuk')
     
@@ -212,12 +258,14 @@ async function enterRoom() {
         let result = faceMatcher(detection[0].descriptor)
         
         if (typeof(result) === 'string') {
-            console.log(result)
+            verificationPopup(result.l, false)
+            // console.log(result)
         }
 
         else {
-            console.log(result)
-            // recordAttendance(result.i, true)
+            // verificationPopup(result.l, true)
+            // console.log(result)
+            recordAttendance(result.i, result.l, true)
         }
     }
 }
@@ -240,12 +288,14 @@ async function exitRoom() {
         let result = faceMatcher(detection[0].descriptor)
         
         if (typeof(result) === 'string') {
-            console.log(result)
+            verificationPopup(result.l, false)
+            // console.log(result)
         }
 
         else {
-            console.log(result)
-            // recordAttendance(result.i, false)
+            // verificationPopup(result.l, true)
+            // console.log(result)
+            recordAttendance(result.i, result.l, false)
         }
     }
 }
