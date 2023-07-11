@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./../../style/style.css" />
     <title>Face Recognition App</title>
-</head>
-<body>
-    <script src="./../component/navbar.js"></script>
 
+    <script defer src="./../../script/script-dashboard.js"></script>
+</head>
+<body onload="init('u')">
     <main>
         <p class="title">DATA USER</p>
 
@@ -32,125 +32,5 @@
             <tbody></tbody>
         </table>
     </main>
-
-    <script>
-        function getUsers() {
-            fetch('http://127.0.0.1:3001/users')
-                .then(res => res.json())
-                .then(data => {
-                    const result = data.result
-                    
-                    if (result.length === 0) {
-                        const markup = `
-                            <tr>
-                                <td class="notFound" colspan="5">Data tidak ditemukan.</td>
-                            </tr>
-                        `
-                        document.querySelector('tbody').insertAdjacentHTML('beforeend', markup)
-                    }
-
-                    else {
-                        let i = 1
-    
-                        result.forEach(user => {
-                            const markup = `
-                                <tr id="${i}">
-                                    <td>${i}</td>
-                                    <td>${user.name}</td>
-                                    <td>${user.training_data === true ? 'Lengkap' : 'Belum Lengkap'}</td>
-                                    <td>${(user.createdAt).slice(0, 10)}</td>
-                                    <td>
-                                        <img onclick="popup(${i})" src="./../../assets/icon-settings.svg" />
-                                        <div class='hide'>
-                                            <p onclick="editUser(${i}, ${user.id})">Edit<p>
-                                            <a href='/pages/dashboard/input-training-data.html?u=${user.name}&i=${user.id}'><p>Input Data Training</p></a>
-                                            <p onclick="deleteUser(${user.id})">Hapus</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                                `
-                                document.querySelector('tbody').insertAdjacentHTML('beforeend', markup)
-                                i++
-                        })
-                    }
-                })
-                .catch(err => {
-                    console.log(err)
-                    const markup = `
-                            <tr>
-                                <td class="notFound" colspan="5">Data tidak ditemukan.</td>
-                            </tr>
-                        `
-                        document.querySelector('tbody').insertAdjacentHTML('beforeend', markup)
-                })
-        }
-
-        function popup(row_id) {
-            const element = document.getElementById(row_id).querySelector('div')
-            element.classList[0] == 'hide' ? element.setAttribute('class', 'show') : element.setAttribute('class', 'hide')
-        }
-
-        function addUser() {
-            const name = document.querySelector('input').value
-            
-            if (!name) {
-                alert('Silahkan input nama user baru!')
-            }
-
-            else {
-                fetch('http://127.0.0.1:3001/users', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, role_id: 0 })
-                })
-                .then(res => res.ok ? window.location.reload() : console.log('Error'))
-                .catch(err => console.log(err))                
-            }
-        }
-
-        function editUser(row_id, uid) {
-            const tr = document.querySelectorAll('tr')
-            
-            for (let i = 1; i < tr.length; i++) {
-                if (i !== row_id) {
-                    tr[i].setAttribute('class', 'noEdit')
-                }
-            }
-            
-            const element = document.getElementById(row_id)
-
-            element.innerHTML = `
-                <tr>
-                    <td>${row_id}</td>
-                    <td><input name="nameInput" type="text" placeholder="" class="tableInput"/></td>
-                    <td><button class="btn btnGreen tableInput" onclick="updateUser(${uid})">Simpan</button</td>
-                    <td><button class="btn btnRed tableInput" onclick="window.location.reload()">Batal</button</td>
-                    <td></td>
-                </tr>
-            `
-        }
-        
-        function updateUser(uid) {
-            const name = document.getElementsByName('nameInput')[0].value
-
-            fetch(`http://127.0.0.1:3001/users/${uid}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name })
-            })
-            .then(res => res.ok ? window.location.reload() : console.log('Error'))
-            .catch(err => console.log(err))
-        }
-
-        function deleteUser(uid) {
-             if (confirm('Hapus data ini?')) {
-                 fetch(`http://127.0.0.1:3001/users/${uid}`, { method: 'DELETE' })
-                     .then(res => res.ok ? window.location.reload() : console.log('Error'))
-                     .catch(err => console.log(err))
-             }
-        }
-
-        getUsers()
-    </script>
 </body>
 </html>

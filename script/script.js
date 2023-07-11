@@ -44,6 +44,19 @@ function updateCanvas() {
     window.requestAnimationFrame(updateCanvas)
 }
 
+function getTemp() {
+    fetch(`http://127.0.0.1:3001/temp`)
+        .then(res => res.json())   
+        .then(data => {
+            const a = document.querySelectorAll('a.info')
+
+            for (let i = 0; i < a.length; i++) {
+                a[i].innerText = data.result[i].count
+            }
+        })
+        .catch(err => console.log(err))
+}
+
 async function getRooms() {
     fetch(`http://127.0.0.1:3001/rooms`)
         .then(res => res.json())
@@ -212,26 +225,6 @@ function verificationPopup(name='Wajah tidak dikenal.', status) {
         </div>
     `
 
-    // if (status) {
-    //     markup = `
-    //         <div class="verificationBox appear">
-    //             <p>Verifikasi berhasil!</p>
-    //             <div class="checklist"></div>
-    //             <p>${name}</p>
-    //         </div>
-    //     `
-    // }
-
-    // else {
-    //     markup = `
-    //         <div class="verificationBox appear">
-    //             <p>Akses tidak diizinkan!</p>
-    //             <div class="not"></div>
-    //             <p>Wajah tidak dikenal.</p>
-    //         </div>
-    //     `
-    // }
-
     div.innerHTML = markup
     document.body.appendChild(div)
     
@@ -310,6 +303,7 @@ function backToHome() {
     const rooms = document.querySelector('section#rooms')
 
     // localStorage.removeItem('currRid')
+    getTemp()
 
     main.removeAttribute('class')
     rooms.setAttribute('class', 'hide')
@@ -332,6 +326,7 @@ window.onload = () => {
 async function init() {
     await loadModel()
     await getRooms()
+    getTemp()
     getDescriptors()
     startCam()
     // console.log(faceapi)
