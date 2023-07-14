@@ -7,13 +7,18 @@
     <link rel="stylesheet" href="./../../style/style.css" />
     <title>Face Recognition App</title>
 
-    <script defer src="./../../script/script-dashboard.js"></script>
+    <!-- <script defer src="./../../script/script-dashboard.js"></script> -->
+    <script defer src="./../../script/tf.min.js"></script>
+    <script defer src="./../../script/face-api.js"></script>
+    <script defer type="module" src="./../../script/script-model.js"></script>
 </head>
-<body onload="addNavbar()">
+<body>
     <!-- Untuk cek atau testing model, liat confusion matrix juga di sini bisa -->
 
-    <main>
-        <p class="title">MODEL</p>
-    </main>
+    <div id="originalImages"></div>
+
+    <div id="landmarks"></div>
+
+    <div id="descriptors"></div>
 </body>
 </html>

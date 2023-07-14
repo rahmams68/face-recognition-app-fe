@@ -10,12 +10,50 @@ let THRESHOLD = 0.6
 let results = []
 let ls = []
 let ds = []
+// const PICT = ['./../../assets/00.jpg', './../../assets/01.png']
 
 async function loadModel() {
     await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
     await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL)
     await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL)
     console.log('Model loaded!')
+}
+
+async function firstInference() {
+    const firstImg = document.getElementById('firstImg')
+    const secondImg = document.getElementById('secondImg')
+    const imgs = [firstImg, secondImg]
+    const dataUrl = []
+
+    for (let i = 0; i < imgs.length; i++) {
+        const tempCanvas = document.createElement('canvas')
+        tempCanvas.width = imgs[i].width
+        tempCanvas.height = imgs[i].height
+        const tempCtx = tempCanvas.getContext('2d')
+
+        tempCtx.drawImage(imgs[i], 0, 0)
+        const url = tempCanvas.toDataURL()
+        dataUrl.push(url)
+    }
+
+    for (let i = 0; i < dataUrl.length; i++) {
+        const image = document.createElement('img')
+        image.src = dataUrl[i]
+        const detection = await faceapi.detectAllFaces(image).withFaceLandmarks().withFaceDescriptors()
+        
+        // if (!detection[0]) {
+        //     console.log('Tidak ada wajah terdeteksi.')
+        // }
+
+        // else {
+        //     console.log('Wajah terdeteksi.')
+        // }
+    }
+
+    console.log('First inference done.')
+
+    firstImg.remove()
+    secondImg.remove()
 }
 
 function startCam() {
@@ -309,26 +347,37 @@ function backToHome() {
     rooms.setAttribute('class', 'hide')
 }
 
-window.onload = () => {
-    setTimeout(() => {
-        if (localStorage.getItem('currRid')) {
-            localStorage.removeItem('currRid')
-        }
+// window.onload = () => {
+//     setTimeout(() => {
+//         if (localStorage.getItem('currRid')) {
+//             localStorage.removeItem('currRid')
+//         }
 
-        const loader = document.querySelector('.loader')
-        loader.setAttribute('class', 'loader loader-hidden')
-        loader.addEventListener('transitionend', () => {
-            loader.remove()
-        })
-    }, 2000)
-}
+//         const loader = document.querySelector('.loader')
+//         loader.setAttribute('class', 'loader loader-hidden')
+//         loader.addEventListener('transitionend', () => {
+//             loader.remove()
+//         })
+//     }, 5000)
+// }
 
 async function init() {
     await loadModel()
+    await firstInference()
     await getRooms()
     getTemp()
     getDescriptors()
     startCam()
+
+    if (localStorage.getItem('currRid')) {
+        localStorage.removeItem('currRid')
+    }
+
+    const loader = document.querySelector('.loader')
+    loader.setAttribute('class', 'loader loader-hidden')
+    loader.addEventListener('transitionend', () => {
+        loader.remove()
+    })
     // console.log(faceapi)
     // console.log(faceapi.nets)
 }

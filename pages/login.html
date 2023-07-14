@@ -14,28 +14,49 @@
     <form>
         <input id="user_id" type="text" placeholder="Masukkan user id" />
         <input id="pass" type="password" placeholder="Masukkan password" />
-        <button class="btn btnGreen" value="Login" onclick="login()">Login</button>
+        <button class="btn btnGreen" value="Login" onclick="login(event)">Login</button>
     </form>
 
-    <script>
-        function login() {
+    <script defer>
+        function login(e) {
+            e.preventDefault()
             const user_id = document.getElementById('user_id').value
             const pass = document.getElementById('pass').value
 
-            // console.log(user_id, pass)
+            console.log(user_id, pass)
 
-            // if (!user_id || !pass) {
-            //     alert('Silahkan masukkan user id dan password terlebih dahulu!')
-            // }
+            if (!user_id || !pass) {
+                alert('Silahkan masukkan user id dan password terlebih dahulu!')
+            }
 
-            // else {
+            else {
                 fetch('http://127.0.0.1:3001/users/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ user_id, pass })
                 })
-                .then(res => res.status === 200 ? window.location.replace('http://127.0.0.1:5500/pages/dashboard') : console.log('Error'))
+                .then(res => res.json())
+                .then(data => {
+                    // console.log(data)
+                    localStorage.setItem('t', data.token)
+                    window.location.replace('http://127.0.0.1:5500/pages/dashboard')
+                })
                 .catch(err => console.log(err))
+            }
+
+            // else {
+            //     fetch('http://127.0.0.1:3001/users/login', {
+            //         method: 'POST',
+            //         headers: { 'Content-Type': 'application/json' },
+            //         body: JSON.stringify({ user_id, pass })
+            //     })
+                // .then(res => res.ok ? window.location.reload() : console.log('Error'))
+                // .then(res => res.json())
+                // .then(data => {
+                //     console.log(data)
+                // })
+                // .then(res => res.status === 200 ? window.location.replace('http://127.0.0.1:5500/pages/dashboard') : console.log('Error'))
+                // .catch(err => console.log(err))
             // }
         }
     </script>

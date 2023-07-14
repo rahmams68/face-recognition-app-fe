@@ -6,7 +6,7 @@ function addNavbar() {
         <a href="/pages/dashboard/users.html">DATA USER</a>
         <a href="/pages/dashboard/rooms.html">DATA RUANGAN</a>
         <a href="/pages/dashboard/report.html">LAPORAN AKSES</a>
-        <a href="/pages/login.html">LOGOUT</a>
+        <a href="/pages/login.html" onclick='logout()'>LOGOUT</a>
     `
     document.body.insertAdjacentElement('afterbegin', nav)
 }
@@ -14,6 +14,11 @@ function addNavbar() {
 function popup(row_id) {
     const element = document.getElementById(row_id).querySelector('div')
     element.classList[0] == 'hide' ? element.setAttribute('class', 'show') : element.setAttribute('class', 'hide')
+}
+
+function logout() {
+    localStorage.removeItem('t')
+    window.location.replace('http://127.0.0.1:5500/pages/dashboard')
 }
 
 function getUsers() {
@@ -45,7 +50,7 @@ function getUsers() {
                                 <img onclick="popup(${i})" src="./../../assets/icon-settings.svg" />
                                 <div class='hide'>
                                     <p onclick="editUser(${i}, ${user.id})">Edit<p>
-                                    <a href='/pages/dashboard/input-training-data.html?u=${user.name}&i=${user.id}'><p>Input Data Training</p></a>
+                                    <a href='/pages/dashboard/input-training-data.html?u=${user.name}&i=${user.id}'><p>Input Descriptor</p></a>
                                     <p onclick="deleteUser(${user.id})">Hapus</p>
                                 </div>
                             </td>
@@ -379,10 +384,16 @@ function deletePermission(pid) {
      }
 }
 
+function getSummary() {
+    console.log('Summary')
+}
+
 function init(p) {
     addNavbar()
 
     switch(p) {
+        case 'h': getSummary()
+            break;
         case 'u': getUsers()
             break;
         case 'r': getRooms()
