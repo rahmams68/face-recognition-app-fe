@@ -42,6 +42,17 @@ body.app section#rooms {
     width: 50%;
 }
 
+a.a-login {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    color: var(--s-lightgrey);
+}
+
+a.a-login:hover {
+    color: var(--p-green);
+}
+
 nav {
     width: 20%;
     height: 100vh;
@@ -368,6 +379,7 @@ ul li {
 }
 
 .prev-container {
+    position: relative;
     width: calc(100% - 320px);
 }
 
@@ -485,6 +497,12 @@ button#btnStart {
     padding: 15px;
 }
 
+button#btnTakePict {
+    width: 82%;
+    margin-top: 30px;
+    padding: 15px;
+}
+
 .btnWhite {
     color: var(--p-green);
     background-color: #FFFFFF;
@@ -551,6 +569,33 @@ tbody tr td.notFound {
     width: 75px;
     height: 75px;
     border: 15px solid #DDDDDD;
+    border-top-color: var(--p-green);
+    border-radius: 50%;
+    animation: loading 0.75s ease infinite;
+}
+
+.mini-loader {
+    position: absolute;
+    z-index: 3;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #edededaa;
+    transition: opacity 0.75s, visibility 0.75s;
+}
+
+.mini-loader-hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.mini-loader::after {
+    content: '';
+    width: 35px;
+    height: 35px;
+    border: 5px solid #DDDDDD;
     border-top-color: var(--p-green);
     border-radius: 50%;
     animation: loading 0.75s ease infinite;

@@ -5,12 +5,13 @@ const MONTH = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', '
 let VIDEO = null
 let CANVAS = null
 let CONTEXT = null
+const v_width = 320
+const v_height = 240
 
-let THRESHOLD = 0.6
+let THRESHOLD = 0.5
 let results = []
 let ls = []
 let ds = []
-// const PICT = ['./../../assets/00.jpg', './../../assets/01.png']
 
 async function loadModel() {
     await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
@@ -39,15 +40,7 @@ async function firstInference() {
     for (let i = 0; i < dataUrl.length; i++) {
         const image = document.createElement('img')
         image.src = dataUrl[i]
-        const detection = await faceapi.detectAllFaces(image).withFaceLandmarks().withFaceDescriptors()
-        
-        // if (!detection[0]) {
-        //     console.log('Tidak ada wajah terdeteksi.')
-        // }
-
-        // else {
-        //     console.log('Wajah terdeteksi.')
-        // }
+        await faceapi.detectAllFaces(image).withFaceLandmarks().withFaceDescriptors()
     }
 
     console.log('First inference done.')
@@ -60,7 +53,8 @@ function startCam() {
     CANVAS = document.getElementById('detectionCanvas')
     CONTEXT = CANVAS.getContext('2d')
 
-    let promise = navigator.mediaDevices.getUserMedia({ video: true })
+    // let promise = navigator.mediaDevices.getUserMedia({ video: true })
+    let promise = navigator.mediaDevices.getUserMedia({ video: { width: v_width, height: v_height } })
 
     promise.then(function(signal) {
         VIDEO = document.createElement('video')
@@ -160,6 +154,8 @@ async function getDescriptors() {
                 })
             })
     } catch(err) {console.log(err)}
+
+    console.log('Descriptor Ready.')
 }
 
 function recordAttendance(uid, v_name, status) {
@@ -196,7 +192,6 @@ function euclideanDistance(face1, face2) {
     }
 
     distance **= 0.5
-    // console.log(distance)
 
     return distance
 }
@@ -212,9 +207,9 @@ function faceMatcher(face) {
         results.push(temp / d.length)
     })
 
-    // console.log(results)
     const min = Math.min(...results)
     const index = results.indexOf(min)
+    console.log('Distance: ', min)
 
     if (min > THRESHOLD) {
         let message = 'Wajah tidak dikenal.'
@@ -222,8 +217,6 @@ function faceMatcher(face) {
     }
 
     else {
-        console.log(ls[index].l)
-        console.log(ls[index].i)
         return ls[index]
     }
 }
@@ -271,6 +264,28 @@ function verificationPopup(name='Wajah tidak dikenal.', status) {
     }, 2000)
 }
 
+function warningPopup(name, status) {
+    let div = document.createElement('div')
+    div.setAttribute('id', 'verificationPopup')
+    div.setAttribute('class', 'verificationPopup')
+
+    let markup = `
+        <div class="verificationBox appear">
+            <p>Peringatan!</p>
+            <p>${status ? 'User berada dalam ruangan lain.' : 'User tidak memasuki ruangan ini.'}</p>
+            <div class='not'></div>
+            <p>${name}</p>
+        </div>
+    `
+
+    div.innerHTML = markup
+    document.body.appendChild(div)
+    
+    setTimeout(() => {
+        document.getElementById('verificationPopup').remove()
+    }, 2000)
+}
+
 async function enterRoom() {
     console.log('Masuk')
     
@@ -287,16 +302,29 @@ async function enterRoom() {
 
     else {        
         let result = faceMatcher(detection[0].descriptor)
+        console.log(result)
         
         if (typeof(result) === 'string') {
             verificationPopup(result.l, false)
-            // console.log(result)
         }
 
         else {
-            // verificationPopup(result.l, true)
-            // console.log(result)
-            recordAttendance(result.i, result.l, true)
+            fetch(`http://127.0.0.1:3001/temp/${result.i}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.result.status === true) {
+                        if (data.result.rid != window.localStorage.getItem('currRid')) {
+                            warningPopup(result.l, true)
+                        }
+                        console.log('WARNING! This user already in another room!')
+                    }
+
+                    else {
+                        console.log('Ok, you can enter.')
+                        verificationPopup(result.l, true)
+                        recordAttendance(result.i, result.l, true)
+                    }
+                })
         }
     }
 }
@@ -320,13 +348,34 @@ async function exitRoom() {
         
         if (typeof(result) === 'string') {
             verificationPopup(result.l, false)
-            // console.log(result)
         }
 
         else {
+            fetch(`http://127.0.0.1:3001/temp/${result.i}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.result.status === false) {
+                        // if (data.result.rid !== window.localStorage.getItem('currRid')) {
+                            warningPopup(result.l, false)
+                        // }
+                        console.log('WARNING! This user did not enter this a room!')
+                    }
+
+                    else {
+                        if (data.result.rid != window.localStorage.getItem('currRid')) {
+                            warningPopup(result.l, false)
+                        }
+
+                        else {
+                            console.log('Ok, you can leave.')
+                            verificationPopup(result.l, true)
+                            recordAttendance(result.i, result.l, false)
+                        }
+                    }
+                })
+
             // verificationPopup(result.l, true)
-            // console.log(result)
-            recordAttendance(result.i, result.l, false)
+            // recordAttendance(result.i, result.l, false)
         }
     }
 }
@@ -347,24 +396,10 @@ function backToHome() {
     rooms.setAttribute('class', 'hide')
 }
 
-// window.onload = () => {
-//     setTimeout(() => {
-//         if (localStorage.getItem('currRid')) {
-//             localStorage.removeItem('currRid')
-//         }
-
-//         const loader = document.querySelector('.loader')
-//         loader.setAttribute('class', 'loader loader-hidden')
-//         loader.addEventListener('transitionend', () => {
-//             loader.remove()
-//         })
-//     }, 5000)
-// }
-
 async function init() {
     await loadModel()
     await firstInference()
-    await getRooms()
+    getRooms()
     getTemp()
     getDescriptors()
     startCam()

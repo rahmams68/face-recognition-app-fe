@@ -1,3 +1,134 @@
+let label, uid
+let count = 0
+let imgElement = []
+let faceDescriptors
+
+const video = document.getElementById('cam')
+const v_width = video.width
+const v_height = video.height
+const btnStart = document.getElementById('btnStart')
+const btnTakePict = document.getElementById('btnTakePict')
+const btnProcessImg = document.getElementById('btnProcessImg')
+const imgContainer = document.getElementById('img-container')
+
+let canvas = document.createElement('canvas')
+let ctx = canvas.getContext('2d')
+canvas.width = v_width
+canvas.height = v_height
+
+const model_url = './../../models'
+
+function setCurrentLabel() {
+    try {
+        var url_string = (window.location.href)
+        var url = new URL(url_string)
+        
+        label = url.searchParams.get('u')
+        uid = url.searchParams.get('i')
+
+        document.querySelector('span').innerText = label
+    } catch(err) {
+        console.log(err)
+    }
+}
+
+async function startCam() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio: false,
+            video: {width: v_width, height: v_height}
+        })
+        handleSuccess(stream)
+        
+        btnStart.setAttribute('class', 'hide')
+        btnTakePict.setAttribute('class', 'btn btnGreen')
+        // btnProcessImg.setAttribute('class', 'btn btnGreen')
+    } catch(err) { console.log(err) }
+}
+
+function handleSuccess(stream) {
+    window.stream = stream
+    video.srcObject = stream
+}
+
+function takePicture() {
+    ctx.drawImage(video, 0, 0)
+    const dataUrl = canvas.toDataURL('image/png')
+
+    const image = document.createElement('img')
+    image.src = dataUrl
+    image.setAttribute('onclick', 'remove(event)')
+    
+    imgElement.push(image)
+    imgContainer.insertAdjacentElement('beforeend', image)
+
+    ctx.clearRect(0, 0, v_width, v_height)
+    
+    count++
+
+    if (count === 1) {
+        btnProcessImg.setAttribute('class', 'btn btnGreen')
+    }
+}
+
+function remove(e) {
+    e.target.remove()
+    count--
+
+    if (count < 1) {
+        btnProcessImg.setAttribute('class', 'btnDisable')
+    }
+}
+
+async function processImg() {
+    document.querySelector('div.prev-container').insertAdjacentHTML('afterbegin', '<div class="mini-loader"></div>')
+    // btnTakePict.setAttribute('class', 'btnDisable')
+    btnProcessImg.setAttribute('class', 'btnDisable')
+
+    if (!faceapi.nets.ssdMobilenetv1._params) {
+        // Promise.all([
+        await faceapi.nets.faceRecognitionNet.loadFromUri(model_url)
+        await faceapi.nets.faceLandmark68Net.loadFromUri(model_url)
+        await faceapi.nets.ssdMobilenetv1.loadFromUri(model_url)
+        console.log('Model loaded!')
+        // ])
+        // .then(console.log('Model loaded'))
+    }
+    
+    // else {
+    faceDescriptors = await loadLabeledImages()
+    console.log(faceDescriptors)
+
+    const loader = document.querySelector('.mini-loader')
+    loader.setAttribute('class', 'mini-loader mini-loader-hidden')
+    loader.addEventListener('transitionend', () => {
+        loader.remove()
+    })
+    // btnTakePict.setAttribute('class', 'btn btnGreen')
+    btnProcessImg.setAttribute('class', 'btn btnGreen')
+    
+    fetch(`http://127.0.0.1:3001/model/descriptor`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: uid, descriptor: faceDescriptors })
+    })
+    .then(res => res.ok ? window.location.href('/pages/dashboard/users.html') : console.log('Error'))
+    .catch(err => console.log(err))
+    // }
+}
+
+async function loadLabeledImages() {
+    const descriptors = []
+
+    for (let i = 0; i < imgElement.length; i++) {
+        const img = await faceapi.fetchImage(imgElement[i].src)
+        const detection = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor()
+        descriptors.push(detection.descriptor)
+    }
+
+    return new faceapi.LabeledFaceDescriptors(label, descriptors)
+}
+
 function addNavbar() {
     const nav = document.createElement('nav')
     nav.innerHTML = `
@@ -14,11 +145,6 @@ function addNavbar() {
 function popup(row_id) {
     const element = document.getElementById(row_id).querySelector('div')
     element.classList[0] == 'hide' ? element.setAttribute('class', 'show') : element.setAttribute('class', 'hide')
-}
-
-function logout() {
-    localStorage.removeItem('t')
-    window.location.replace('http://127.0.0.1:5500/pages/dashboard')
 }
 
 function getUsers() {
@@ -385,24 +511,85 @@ function deletePermission(pid) {
 }
 
 function getSummary() {
-    console.log('Summary')
+    fetch('http://127.0.0.1:3001/summary')
+        .then(res => res.json())
+        .then(data => {
+            document.querySelector('p#u').innerText = data.result.users
+            document.querySelector('p#r').innerText = data.result.rooms
+            document.querySelector('p#a').innerText = data.result.attendances
+        })
+}
+
+function checkBeforeLogin() {
+    if (window.localStorage.getItem('t')) {
+        window.location.replace('http://127.0.0.1:5500/pages/dashboard')
+    }
+}
+
+function check() {
+    if (!window.localStorage.getItem('t')) {
+        return false
+    }
+
+    else {
+        return true
+    }
+}
+
+function login(e) {
+    e.preventDefault()
+    const user_id = document.getElementById('user_id').value
+    const pass = document.getElementById('pass').value
+
+    console.log(user_id, pass)
+
+    if (!user_id || !pass) {
+        alert('Silahkan masukkan user id dan password terlebih dahulu!')
+    }
+
+    else {
+        fetch('http://127.0.0.1:3001/users/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id, pass })
+        })
+        .then(res => res.json())
+        .then(data => {
+            localStorage.setItem('t', data.token)
+            window.location.replace('http://127.0.0.1:5500/pages/dashboard')
+        })
+        .catch(err => console.log(err))
+    }
+}
+
+function logout() {
+    localStorage.removeItem('t')
+    window.location.replace('http://127.0.0.1:5500/pages/login.html')
 }
 
 function init(p) {
-    addNavbar()
+    if (!check()) {
+        window.location.replace('http://127.0.0.1:5500/pages/login.html')
+    }
 
-    switch(p) {
-        case 'h': getSummary()
-            break;
-        case 'u': getUsers()
-            break;
-        case 'r': getRooms()
-            break;
-        case 're': getReport()
-            break;
-        case 'a': getUserOptions()
-            break;
-        default:
-            break;
+    else {
+        addNavbar()
+    
+        switch(p) {
+            case 'h': getSummary()
+                break;
+            case 'u': getUsers()
+                break;
+            case 'r': getRooms()
+                break;
+            case 're': getReport()
+                break;
+            case 'a': getUserOptions()
+                break;
+            case 'i': setCurrentLabel()
+                break;
+            default:
+                break;
+        }
     }
 }

@@ -10,9 +10,7 @@
     <script defer src="./../../script/face-api.js"></script>
     <script defer src="./../../script/script-dashboard.js"></script>
 </head>
-<body onload="">
-    <script src="./../component/navbar.js"></script>
-
+<body onload="init('i')">
     <main>
         <p class="title">INPUT DESCRIPTOR: <span></span></p>
 
@@ -34,126 +32,137 @@
         </div>
     </main>
 
-    <!-- <script src="./../../script/face-api.js"></script> -->
     <script>
-        let label, uid
-        let count = 0
-        let imgElement = []
-        let faceDescriptors
+        // let label, uid
+        // let count = 0
+        // let imgElement = []
+        // let faceDescriptors
 
-        const video = document.getElementById('cam')
-        const v_width = video.width
-        const v_height = video.height
-        const btnStart = document.getElementById('btnStart')
-        const btnTakePict = document.getElementById('btnTakePict')
-        const btnProcessImg = document.getElementById('btnProcessImg')
-        const imgContainer = document.getElementById('img-container')
+        // const video = document.getElementById('cam')
+        // const v_width = video.width
+        // const v_height = video.height
+        // const btnStart = document.getElementById('btnStart')
+        // const btnTakePict = document.getElementById('btnTakePict')
+        // const btnProcessImg = document.getElementById('btnProcessImg')
+        // const imgContainer = document.getElementById('img-container')
         
-        let canvas = document.createElement('canvas')
-        let ctx = canvas.getContext('2d')
-        canvas.width = v_width
-        canvas.height = v_height
+        // let canvas = document.createElement('canvas')
+        // let ctx = canvas.getContext('2d')
+        // canvas.width = v_width
+        // canvas.height = v_height
 
-        const model_url = './../../models'
+        // const model_url = './../../models'
 
-        window.onload = function() {
-            try {
-                var url_string = (window.location.href)
-                var url = new URL(url_string)
+        // window.onload = function() {
+        //     try {
+        //         var url_string = (window.location.href)
+        //         var url = new URL(url_string)
                 
-                label = url.searchParams.get('u')
-                uid = url.searchParams.get('i')
+        //         label = url.searchParams.get('u')
+        //         uid = url.searchParams.get('i')
 
-                document.querySelector('span').innerText = label
-            } catch(err) {
-                console.log(err)
-            }
-        }
+        //         document.querySelector('span').innerText = label
+        //     } catch(err) {
+        //         console.log(err)
+        //     }
+        // }
 
-        async function startCam() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    audio: false,
-                    video: {width: v_width, height: v_height}
-                })
-                handleSuccess(stream)
+        // async function startCam() {
+        //     try {
+        //         const stream = await navigator.mediaDevices.getUserMedia({
+        //             audio: false,
+        //             video: {width: v_width, height: v_height}
+        //         })
+        //         handleSuccess(stream)
                 
-                btnStart.setAttribute('class', 'hide')
-                btnTakePict.setAttribute('class', 'btn btnGreen')
-                // btnProcessImg.setAttribute('class', 'btn btnGreen')
-            } catch(err) { console.log(err) }
-        }
+        //         btnStart.setAttribute('class', 'hide')
+        //         btnTakePict.setAttribute('class', 'btn btnGreen')
+        //         // btnProcessImg.setAttribute('class', 'btn btnGreen')
+        //     } catch(err) { console.log(err) }
+        // }
 
-        function handleSuccess(stream) {
-            window.stream = stream
-            video.srcObject = stream
-        }
+        // function handleSuccess(stream) {
+        //     window.stream = stream
+        //     video.srcObject = stream
+        // }
 
-        function takePicture() {
-            ctx.drawImage(video, 0, 0)
-            const dataUrl = canvas.toDataURL('image/png')
+        // function takePicture() {
+        //     ctx.drawImage(video, 0, 0)
+        //     const dataUrl = canvas.toDataURL('image/png')
 
-            const image = document.createElement('img')
-            image.src = dataUrl
-            image.setAttribute('onclick', 'remove(event)')
+        //     const image = document.createElement('img')
+        //     image.src = dataUrl
+        //     image.setAttribute('onclick', 'remove(event)')
             
-            imgElement.push(image)
-            imgContainer.insertAdjacentElement('beforeend', image)
+        //     imgElement.push(image)
+        //     imgContainer.insertAdjacentElement('beforeend', image)
 
-            ctx.clearRect(0, 0, v_width, v_height)
+        //     ctx.clearRect(0, 0, v_width, v_height)
             
-            count++
+        //     count++
 
-            if (count === 1) {
-                btnProcessImg.setAttribute('class', 'btn btnGreen')
-            }
-        }
+        //     if (count === 1) {
+        //         btnProcessImg.setAttribute('class', 'btn btnGreen')
+        //     }
+        // }
 
-        function remove(e) {
-            e.target.remove()
-            count--
+        // function remove(e) {
+        //     e.target.remove()
+        //     count--
 
-            if (count < 1) {
-                btnProcessImg.setAttribute('class', 'btnDisable')
-            }
-        }
+        //     if (count < 1) {
+        //         btnProcessImg.setAttribute('class', 'btnDisable')
+        //     }
+        // }
 
-        async function processImg() {
-            if (!faceapi.nets.ssdMobilenetv1._params) {
-                // Promise.all([
-                await faceapi.nets.faceRecognitionNet.loadFromUri(model_url)
-                await faceapi.nets.faceLandmark68Net.loadFromUri(model_url)
-                await faceapi.nets.ssdMobilenetv1.loadFromUri(model_url)
-                console.log('Model loaded!')
-                // ])
-                // .then(console.log('Model loaded'))
-            }
+        // async function processImg() {
+        //     document.querySelector('div.prev-container').insertAdjacentHTML('afterbegin', '<div class="mini-loader"></div>')
+        //     // btnTakePict.setAttribute('class', 'btnDisable')
+        //     btnProcessImg.setAttribute('class', 'btnDisable')
+
+        //     if (!faceapi.nets.ssdMobilenetv1._params) {
+        //         // Promise.all([
+        //         await faceapi.nets.faceRecognitionNet.loadFromUri(model_url)
+        //         await faceapi.nets.faceLandmark68Net.loadFromUri(model_url)
+        //         await faceapi.nets.ssdMobilenetv1.loadFromUri(model_url)
+        //         console.log('Model loaded!')
+        //         // ])
+        //         // .then(console.log('Model loaded'))
+        //     }
             
-            // else {
-            faceDescriptors = await loadLabeledImages()
-            console.log(faceDescriptors)
+        //     // else {
+        //     faceDescriptors = await loadLabeledImages()
+        //     console.log(faceDescriptors)
+
+        //     const loader = document.querySelector('.mini-loader')
+        //     loader.setAttribute('class', 'mini-loader mini-loader-hidden')
+        //     loader.addEventListener('transitionend', () => {
+        //         loader.remove()
+        //     })
+        //     // btnTakePict.setAttribute('class', 'btn btnGreen')
+        //     btnProcessImg.setAttribute('class', 'btn btnGreen')
             
-            fetch(`http://127.0.0.1:3001/model/descriptor`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: uid, descriptor: faceDescriptors })
-            })
-            .then(res => res.ok ? window.location.href('/pages/dashboard/users.html') : console.log('Error'))
-            .catch(err => console.log(err))
-            // }
-        }
+        //     fetch(`http://127.0.0.1:3001/model/descriptor`, {
+        //         method: 'POST',
+        //         headers: { 'Content-Type': 'application/json' },
+        //         body: JSON.stringify({ id: uid, descriptor: faceDescriptors })
+        //     })
+        //     .then(res => res.ok ? window.location.href('/pages/dashboard/users.html') : console.log('Error'))
+        //     .catch(err => console.log(err))
+        //     // }
+        // }
 
-        async function loadLabeledImages() {
-            const descriptors = []
+        // async function loadLabeledImages() {
+        //     const descriptors = []
 
-            for (let i = 0; i < imgElement.length; i++) {
-                const img = await faceapi.fetchImage(imgElement[i].src)
-                const detection = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor()
-                descriptors.push(detection.descriptor)
-            }
+        //     for (let i = 0; i < imgElement.length; i++) {
+        //         const img = await faceapi.fetchImage(imgElement[i].src)
+        //         const detection = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor()
+        //         descriptors.push(detection.descriptor)
+        //     }
 
-            return new faceapi.LabeledFaceDescriptors(label, descriptors)
-        }
+        //     return new faceapi.LabeledFaceDescriptors(label, descriptors)
+        // }
     </script>
 </body>
 </html>
