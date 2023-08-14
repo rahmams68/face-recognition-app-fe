@@ -133,9 +133,10 @@ async function getRoomAttendances() {
 
             if (result.length !== 0) {
                 result.forEach(data => {
+                    const date = `${data.date.slice(8, 10)}/${data.date.slice(5, 7)}/${data.date.slice(2, 4)}`
                     const markup = `
                         <li>${data.username}</li>
-                        <li>${(data.date).slice(0, 10)} ${data.status ? "<span class='green'>>></span>" : "<span class='red'><<</span>"}</li>
+                        <li>${date} ${data.status ? "<span class='green'>>></span>" : "<span class='red'><<</span>"}</li>
                     `
                     list.insertAdjacentHTML('beforeend', markup)
                 })
@@ -269,10 +270,20 @@ function warningPopup(name, status) {
     div.setAttribute('id', 'verificationPopup')
     div.setAttribute('class', 'verificationPopup')
 
+    let message
+    
+    if (status === 'this') {
+        message = 'User telah berada di ruangan ini.'
+    }
+
+    else {
+        message = status ? 'User berada di ruangan lain.' : 'User tidak memasuki ruangan ini.'
+    }
+
     let markup = `
         <div class="verificationBox appear">
             <p>Peringatan!</p>
-            <p>${status ? 'User berada dalam ruangan lain.' : 'User tidak memasuki ruangan ini.'}</p>
+            <p>${message}</p>
             <div class='not'></div>
             <p>${name}</p>
         </div>
@@ -316,12 +327,16 @@ async function enterRoom() {
                         if (data.result.rid != window.localStorage.getItem('currRid')) {
                             warningPopup(result.l, true)
                         }
+
+                        else {
+                            warningPopup(result.l, 'this')
+                        }
                         console.log('WARNING! This user already in another room!')
                     }
 
                     else {
                         console.log('Ok, you can enter.')
-                        verificationPopup(result.l, true)
+                        // verificationPopup(result.l, true)
                         recordAttendance(result.i, result.l, true)
                     }
                 })
@@ -368,7 +383,7 @@ async function exitRoom() {
 
                         else {
                             console.log('Ok, you can leave.')
-                            verificationPopup(result.l, true)
+                            // verificationPopup(result.l, true)
                             recordAttendance(result.i, result.l, false)
                         }
                     }

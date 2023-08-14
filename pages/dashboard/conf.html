@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>face-api.js</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+    <input type="file" id="imageUpload" />
+
+    <script src="./../../script/face-api.js"></script>
+    <script>
+        const imageUpload = document.getElementById('imageUpload')
+        
+        const descriptors = []
+        const labels = ['1', '3', '4', '5', '6', '7', '8', '10', '12', '13', '14', '15', '17', '18', '19']
+        const MODEL_URL = './../../models'
+        const THRESHOLD = 0.6
+        
+        async function start() {
+            const container = document.createElement('div')
+            container.style.position = 'relative'
+            document.body.append(container)
+            document.body.append('Loaded')
+
+            let image, canvas
+
+            imageUpload.addEventListener('change', async () => {
+                if (image) image.remove()
+                if (canvas) canvas.remove()
+    
+                image = await faceapi.bufferToImage(imageUpload.files[0])
+                container.append(image)
+
+                canvas = faceapi.createCanvasFromMedia(image)
+                container.append(canvas)
+
+                const displaySize = { width: image.width, height: image.height }
+                faceapi.matchDimensions(canvas, displaySize)
+
+                const detections = await faceapi.detectAllFaces(image).withFaceLandmarks().withFaceDescriptors()
+
+                if (!detections[0]) {
+                    console.log('Tidak ada wajah terdeteksi.')
+                }
+
+                else {
+                    console.log('Wajah terdeteksi.')
+                    let result = faceMatcher(detections[0].descriptor)
+                    console.log('RESULT:', result)
+                }
+            })
+        }
+        
+        async function loadModel() {
+            await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+            await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL)
+            await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL)
+            console.log('Model loaded!')
+        }
+
+        function euclideanDistance(face1, face2) {
+            let distance = 0
+
+            if (face1.length != face2.length) {
+                console.log('Error')
+                return false
+            }
+
+            for (let i = 0; i < face1.length; i++) {
+                distance += (face1[i] - face2[i]) ** 2
+            }
+
+            distance **= 0.5
+
+            return distance
+        }
+
+        function faceMatcher(face) {
+            let results = []
+
+            descriptors.map(d => {
+                let temp = 0
+                for (let i = 0; i < d['descriptors'].length; i++) {
+                    temp += euclideanDistance(face, d['descriptors'][i])
+                }
+                results.push(temp / d['descriptors'].length)
+            })
+
+            const min = Math.min(...results)
+            const index = results.indexOf(min)
+            console.log('Distance: ', min)
+
+            // if (min > THRESHOLD) {
+            //     let message = 'Wajah tidak dikenal.'
+            //     return message
+            // }
+
+            // else {
+                return descriptors[index]['label']
+            // }
+        }
+
+        async function loadLabeledImages() {
+            console.log('Load Images')
+
+            for (let i = 0; i < labels.length; i++) {
+                const descriptor = []
+                // console.log(labels[i])
+
+                // let num = 1
+                // let status = true
+
+                // do {
+                //     console.log(`${labels[i]}-${num}`)
+                //     const img = await faceapi.fetchImage(`../../labeled_images/${labels[i]}/${labels[i]}-${num}.jpg`) ? await faceapi.fetchImage(`../../labeled_images/${labels[i]}/${labels[i]}-${num}.jpg`) : false
+
+                //     if (img) {
+                //         num++
+                //     }
+
+                //     else {
+                //         status = false
+                //     }
+                // } while(status)
+
+                for (let j = 1; j <= 3; j++) {
+                    console.log(`${labels[i]}-${j}`)
+                    const img = await faceapi.fetchImage(`../../labeled_images/${labels[i]}/${labels[i]}-${j}.jpg`)
+                    const detection = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor()
+
+                    // console.log(detection)
+
+                    if (!detection) {
+                        console.log('Tidak ada wajah terdeteksi.')
+                    }
+
+                    else {
+                        descriptor.push(detection.descriptor)
+                        console.log(detection.descriptor)
+                    }
+
+                }
+
+                descriptors.push({
+                    'label': labels[i],
+                    'descriptors': descriptor
+                })
+            }
+
+            console.log(descriptors)
+        }
+
+        async function init() {
+            await loadModel()
+            await loadLabeledImages()
+            await start()
+        }
+
+        init()
+    </script>
+</body>
+</html>

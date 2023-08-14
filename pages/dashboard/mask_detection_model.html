@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Mask Detection Model</title>
+    </head>
+
+    <body>
+        <h1>Make Mask Detection Model ('Teachible Machine') using Transfer Learning</h1>
+
+        <p id="status">Awaiting TF.js load</p>
+        <video id="video" autoplay></video>
+
+        <button id="enableCam">Enable Webcam</button>
+        <button class="dataCollector" data-1hot="0" data-name="Mask">Gather Class 1 (Mask)</button>
+        <button class="dataCollector" data-1hot="1" data-name="No Mask">Gather Class 2 (No Mask)</button>
+        <button id="train">Train &amp; Predict!</button>
+        <button id="reset">Reset</button>
+
+        <script src="./../../script/tf.min.js" type="text/javascript" ></script>
+        <script type="module">
+            const status = document.getElementById('status')
+            const video = document.getElementById('video')
+
+            const btnEnableCam = document.getElementById('enableCam')
+            const btnTrain = document.getElementById('train')
+            const btnReset = document.getElementById('reset')
+            let btnDataCollector = document.querySelectorAll('button.dataCollector')
+
+            const inputWidth = 224
+            const inputHeight = 224
+            const stopDataGather = -1
+            const class_names = []
+
+            btnEnableCam.addEventListener('click', enableCam)
+            btnTrain.addEventListener('click', trainAndPredict)
+            btnReset.addEventListener('click', reset)
+            
+            btnDataCollector.forEach(btn => {
+                btn.addEventListener('mousedown', gatherDataForClass)
+                btn.addEventListener('mouseup', gatherDataForClass)
+                class_names.push(btn.getAttribute('data-name'))
+            })
+
+            // for (let i = 0; i < btnDataCollector.length; i++) {
+            //     btnDataCollector[i].addEventListener('mousedown', gatherDataForClass)
+            //     btnDataCollector[i].addEventListener('mouseup', gatherDataForClass)
+            //     class_names.push(btnDataCollector[i].getAttribute('data-name'))
+            // }
+
+            let mobilenet = undefined
+            let mobilenetBase = undefined
+            let gatherDataState = stopDataGather
+            let videoPlaying = false
+            let trainingDataInputs = []
+            let trainingDataOutputs = []
+            let examplesCount = []
+            let predict = false
+
+            async function loadMobileNetFeatureModel() {
+                const URL = './../../models/model_imagenet_mobilenet_v3/1/model.json'
+
+                mobilenet = await tf.loadGraphModel(URL)
+                const saveResults = await mobilenet.save('downloads://graph-model')
+                status.innerText = 'MobileNet v3 loaded successfully!'
+
+                mobilenet.print()
+
+                // mobilenet.summary()
+
+                // tf.tidy(function() {
+                //     let answer = mobilenet.predict(tf.zeros([1, inputHeight, inputWidth, 3]))
+                //     console.log(answer.shape)
+                // })
+            }
+
+            loadMobileNetFeatureModel()
+
+            let model = tf.sequential()
+            model.add(tf.layers.dense({inputShape: [1280], units: 128, activation: 'relu'}))
+            model.add(tf.layers.dense({units: class_names.length, activation: 'softmax'}))
+            model.summary()
+
+            model.compile({
+                optimizer: 'adam',
+                loss: (class_names.length === 2) ? 'binaryCrossentropy' : 'categoricalCrossentropy',
+                metrics: ['accuracy']
+            })
+
+            function hasGetUserMedia() {
+                return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)
+            }
+
+            function enableCam() {
+                if (hasGetUserMedia()) {
+                    const constraints = {
+                        video: true,
+                        width: 640,
+                        height: 480
+                    }
+
+                    navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
+                        video.srcObject = stream
+                        video.addEventListener('loadeddata', function() {
+                            videoPlaying = true
+                            btnEnableCam.classList.add('removed')
+                        })
+                    })
+                }
+
+                else {
+                    console.warn('getUserMedia() is not supported by your browser')
+                }
+            }
+
+            function gatherDataForClass() {
+                let classNumber = parseInt(this.getAttribute('data-1hot'))
+                gatherDataState = (gatherDataState === stopDataGather) ? classNumber : stopDataGather
+                dataGatherLoop()
+                // console.log(this)
+                // console.log(classNumber)
+            }
+
+            function dataGatherLoop() {
+                if (videoPlaying && gatherDataState !== stopDataGather) {
+                    let imageFeatures = tf.tidy(function() {
+                        let videoFrameAsTensor = tf.browser.fromPixels(video)
+                        let resizedTensorFrame = tf.image.resizeBilinear(videoFrameAsTensor, [inputHeight, inputWidth], true)
+                        let normalizedTensorFrame = resizedTensorFrame.div(255)
+                        
+                        return mobilenet.predict(normalizedTensorFrame.expandDims()).squeeze()
+                    })
+
+                    trainingDataInputs.push(imageFeatures)
+                    trainingDataOutputs.push(gatherDataState)
+
+                    if (examplesCount[gatherDataState] === undefined) {
+                        examplesCount[gatherDataState] = 0
+                    }
+
+                    examplesCount[gatherDataState]++
+                    // console.log(gatherDataState)
+                    // console.log(examplesCount[gatherDataState])
+                    status.innerText = ''
+
+                    for (let n = 0; n < class_names.length; n++) {
+                        status.innerText += class_names[n] + ' data count: ' + examplesCount[n] + '. '
+                    }
+
+                    window.requestAnimationFrame(dataGatherLoop)
+                }
+            }
+
+            async function trainAndPredict() {
+                predict = false
+                console.log(trainingDataInputs)
+                console.log(trainingDataOutputs)
+                tf.util.shuffleCombo(trainingDataInputs, trainingDataOutputs)
+                let tensorOutput = tf.tensor1d(trainingDataOutputs, 'int32')
+                let oneHotOutputs = tf.oneHot(tensorOutput, class_names.length)
+                let tensorInput = tf.stack(trainingDataInputs)
+
+                let result = await model.fit(tensorInput, oneHotOutputs, {
+                    shuffle: true,
+                    batchSize: 5,
+                    epochs: 10,
+                    callbacks: {onEpochEnd: logProgress}
+                })
+
+                tensorOutput.dispose()
+                oneHotOutputs.dispose()
+                tensorInput.dispose()
+                
+                predict = true
+
+                let combinedModel = tf.sequential()
+                // combinedModel.add(mobilenet)
+                combinedModel.add(model)
+
+                combinedModel.compile({
+                    optimizer: 'adam',
+                    loss: (class_names.length === 2) ? 'binaryCrossentropy' : 'categoricalCrossentropy'}
+                )
+
+                combinedModel.summary()
+                await combinedModel.save('downloads://mask-detection-model')
+
+                predictLoop()
+            }
+
+            function logProgress(epoch, logs) {
+                console.log('Data for epoch ' + epoch, logs)
+            }
+
+            function predictLoop() {
+                if (predict) {
+                    tf.tidy(function() {
+                        let videoFrameAsTensor = tf.browser.fromPixels(video).div(255)
+                        let resizedTensorFrame = tf.image.resizeBilinear(videoFrameAsTensor, [inputHeight, inputWidth], true)
+
+                        let imageFeatures = mobilenet.predict(resizedTensorFrame.expandDims())
+                        let prediction = model.predict(imageFeatures).squeeze()
+                        let highestIndex = prediction.argMax().arraySync()
+                        let predictionArray = prediction.arraySync()
+
+                        status.innerText = 'Prediction: ' + class_names[highestIndex] + ' with ' + Math.floor(predictionArray[highestIndex] * 100) + '% confidence'
+                    })
+                    
+                    window.requestAnimationFrame(predictLoop)
+                }
+            }
+
+            function reset() {
+                predict = false
+                examplesCount.splice(0)
+
+                for (let i = 0; i < trainingDataInputs.length; i++) {
+                    trainingDataInputs[i].dispose()
+                }
+
+                trainingDataInputs.splice(0)
+                trainingDataOutputs.splice(0)
+
+                status.innerText = 'No data collected'
+
+                console.log('Tensors in memory: ' + tf.memory().numTensors)
+            }
+        </script>
+    </body>
+</html>

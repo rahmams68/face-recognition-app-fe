@@ -228,6 +228,8 @@ div.single-form {
     margin: 30px 0;
     height: fit-content;
     flex-direction: row;
+    display: flex;
+    justify-content: space-between;
 }
 
 div.single-form input, div.single-form select {
@@ -248,6 +250,7 @@ div.single-form select {
     border-radius: 4px;
     border: 1px solid var(--s-grey);
     outline: none;
+    cursor: pointer;
 }
 
 div.single-form select option:first-child {
@@ -528,6 +531,53 @@ button#btnTakePict {
     border: none;
 }
 
+.search-container {
+    position: relative;
+}
+
+.search-container input:first-child {
+    margin-right: 0 !important;
+}
+
+input.btnSearch {
+    position: absolute;
+    width: 40px;
+    height: 100%;
+    right: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+img.img-search {
+    background-color: var(--p-green);
+    position: absolute;
+    top: 0;
+    padding: 0 12px;
+    right: 0px;
+    width: 16px;
+    height: 100%;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    cursor: pointer;
+}
+
+img.img-search:hover {
+    background-color: var(--p-green-hover);
+}
+
+input.btnSearch::after {
+    content: url('./../assets/logo-pnj.png');
+    width: 100px;
+    height: 100px;
+    position: absolute;
+    z-index: 1;
+    background-color: #000000;
+}
+
+/* .i-add::before {
+    content: url('./../assets/icon-add.svg');
+} */
+
 .show {
     display: inherit;
 }
@@ -633,6 +683,8 @@ button.back:hover {
     top: 0;
     right: 0;
     /* background-color: #0E9B8233; */
+    /* background-color: #E5E5E566; */
+    background-color: #95959544;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -776,5 +828,57 @@ button.back:hover {
 
     100% {
         border-top-color: var(--s-red);
+    }
+}
+
+.popMsg {
+    width: fit-content;
+    height: 50px;
+    padding: 0 20px;
+    position: fixed;
+    z-index: 2;
+    top: 30px;
+    right: 30px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    opacity: 0;
+    animation: popMessage 3s ease;
+}
+
+.popMsg p {
+    margin-left: 10px;
+    text-align: center;
+}
+
+.alert {
+    background-color: rgb(255, 215, 215);
+}
+
+.success {
+    background-color: rgb(207, 255, 207);
+}
+
+@keyframes popMessage {
+    0% {
+        opacity: 1;
+        right: -330px;
+    }
+
+    10% {
+        right: 40px;
+    }
+
+    15% {
+        right: 30px;
+    }
+
+    80% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
     }
 }

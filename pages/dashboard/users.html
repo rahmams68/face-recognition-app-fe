@@ -14,8 +14,15 @@
         <p class="title">DATA USER</p>
 
         <div class="single-form">
-            <input type="text" placeholder="Masukkan nama user baru . . ." value=""/>
-            <input class="btn btnGreen" type="submit" onclick="addUser()" value="Tambah Data"/>
+            <div>
+                <input type="text" placeholder="Masukkan nama user baru . . ." value=""/>
+                <input class="btn btnGreen" type="submit" onclick="addUser(event)" value="Tambah Data"/>
+            </div>
+
+            <div class="search-container">
+                <input id="search-input" type="text" placeholder="Cari berdasarkan nama . . ." value="" />
+                <img class="img-search" src="./../../assets/icon-search.svg" onclick="findData(event, 'user')" />
+            </div>
         </div>
 
         <table>

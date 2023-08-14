@@ -13,6 +13,18 @@
     <main>
         <p class="title">LAPORAN AKSES RUANGAN</p>
 
+        <div class="single-form">
+            <div>
+                <select id="room-select" name="rooms">
+                    <option id="0" value="">-- Pilih ruangan --</option>
+                </select>
+
+                <input id="date-select" type="date"/>
+                <input id="filter" class="btn btnGreen" type="submit" onclick="filterReport(event)" value="Filter" />
+                <input id="reset" class="btn btnRed" type="submit" onclick="reset()" value="Reset" />
+            </div>
+        </div>
+
         <table>
             <thead>
                 <tr>

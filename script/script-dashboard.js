@@ -112,6 +112,15 @@ async function processImg() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: uid, descriptor: faceDescriptors })
     })
+    .then(res => {
+        if (res.ok) {
+            popMessage('success', 'Descriptor berhasil ditambahkan.')
+
+            setTimeout(() => {
+                window.location.href('/pages/dashboard/users.html')
+            }, 3500)
+        }
+    })
     .then(res => res.ok ? window.location.href('/pages/dashboard/users.html') : console.log('Error'))
     .catch(err => console.log(err))
     // }
@@ -131,8 +140,9 @@ async function loadLabeledImages() {
 
 function addNavbar() {
     const nav = document.createElement('nav')
+    const uname = localStorage.getItem('n')
     nav.innerHTML = `
-        <a>ADMIN (Rahma Maulida)</a>
+        <a>ADMIN (${uname})</a>
         <a href="/pages/dashboard">BERANDA</a>
         <a href="/pages/dashboard/users.html">DATA USER</a>
         <a href="/pages/dashboard/rooms.html">DATA RUANGAN</a>
@@ -147,8 +157,8 @@ function popup(row_id) {
     element.classList[0] == 'hide' ? element.setAttribute('class', 'show') : element.setAttribute('class', 'hide')
 }
 
-function getUsers() {
-    fetch('http://127.0.0.1:3001/users')
+function getUsers(endpoint='users') {
+    fetch(`http://127.0.0.1:3001/${endpoint}`)
         .then(res => res.json())
         .then(data => {
             const result = data.result
@@ -175,9 +185,9 @@ function getUsers() {
                             <td>
                                 <img onclick="popup(${i})" src="./../../assets/icon-settings.svg" />
                                 <div class='hide'>
-                                    <p onclick="editUser(${i}, ${user.id})">Edit<p>
-                                    <a href='/pages/dashboard/input-training-data.html?u=${user.name}&i=${user.id}'><p>Input Descriptor</p></a>
-                                    <p onclick="deleteUser(${user.id})">Hapus</p>
+                                    <p class='i-edit' onclick="editUser(${i}, ${user.id}, '${user.name}')">Edit<p>
+                                    <a class='i-add' href='/pages/dashboard/input-training-data.html?u=${user.name}&i=${user.id}'><p>Input Descriptor</p></a>
+                                    <p class='i-del' onclick="deleteUser(event, ${user.id})">Hapus</p>
                                 </div>
                             </td>
                         </tr>
@@ -198,25 +208,78 @@ function getUsers() {
         })
 }
 
-function addUser() {
-    const name = document.querySelector('input').value
-    
-    if (!name) {
-        alert('Silahkan input nama user baru!')
+function findData(e, category) {
+    const value = document.getElementById('search-input').value
+
+    if (!value) {
+        e.preventDefault()
     }
 
     else {
+        document.querySelector('tbody').remove()
+        document.querySelector('table').insertAdjacentHTML('beforeend', '<tbody></tbody>')
+
+        switch (category) {
+            case 'user': getUsers(`users?name=${value}`)
+                break;
+            case 'room': getRooms(`rooms?name=${value}`)
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+function popMessage(type, message) {
+    const markup = `
+    <div class="popMsg ${type}">
+        <img src="./../../assets/icon-alert.svg" alt="( ! )" />
+        <p class="message">${message}</p>
+    </div>
+    `
+    
+    document.body.insertAdjacentHTML('afterbegin', markup)
+    
+    setTimeout(() => {
+        document.querySelector('div.popMsg').remove()
+    }, 3500)
+
+}
+
+function addUser(e) {
+    const name = document.querySelector('input').value
+    
+    if (!name) {
+        // alert('Silahkan input nama user baru!')
+        popMessage('alert', 'Silahkan input nama user baru!')
+    }
+
+    else {
+        e.preventDefault()
         fetch('http://127.0.0.1:3001/users', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, role_id: 0 })
         })
-        .then(res => res.ok ? window.location.reload() : console.log('Error'))
+        .then(res => {
+            if (res.ok) {
+                document.querySelector('tbody').remove()
+                document.querySelector('table').insertAdjacentHTML('beforeend', '<tbody></tbody>')
+
+                popMessage('success', 'User baru berhasil ditambahkan.')
+                getUsers()
+                
+            }
+
+            else {
+                console.log('Error')
+            }
+        })
         .catch(err => console.log(err))                
     }
 }
 
-function editUser(row_id, uid) {
+function editUser(row_id, uid, uname) {
     const tr = document.querySelectorAll('tr')
     
     for (let i = 1; i < tr.length; i++) {
@@ -230,7 +293,7 @@ function editUser(row_id, uid) {
     element.innerHTML = `
         <tr>
             <td>${row_id}</td>
-            <td><input name="nameInput" type="text" placeholder="" class="tableInput"/></td>
+            <td><input name="nameInput" type="text" value='${uname}' class="tableInput"/></td>
             <td><button class="btn btnGreen tableInput" onclick="updateUser(${uid})">Simpan</button</td>
             <td><button class="btn btnRed tableInput" onclick="window.location.reload()">Batal</button</td>
             <td></td>
@@ -246,20 +309,46 @@ function updateUser(uid) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name })
     })
-    .then(res => res.ok ? window.location.reload() : console.log('Error'))
+    .then(res => {
+        if (res.ok) {
+            document.querySelector('tbody').remove()
+            document.querySelector('table').insertAdjacentHTML('beforeend', '<tbody></tbody>')
+
+            popMessage('success', 'Data user berhasil diperbarui.')
+            getUsers()
+        }
+
+        else {
+            console.log('Error')
+        }
+    })
     .catch(err => console.log(err))
 }
 
-function deleteUser(uid) {
+function deleteUser(e, uid) {
+    e.preventDefault()
+
      if (confirm('Hapus data ini?')) {
          fetch(`http://127.0.0.1:3001/users/${uid}`, { method: 'DELETE' })
-             .then(res => res.ok ? window.location.reload() : console.log('Error'))
-             .catch(err => console.log(err))
+            .then(res => {
+                if (res.ok) {
+                    document.querySelector('tbody').remove()
+                    document.querySelector('table').insertAdjacentHTML('beforeend', '<tbody></tbody>')
+
+                    popMessage('success', 'Data user berhasil dihapus.')
+                    getUsers()
+                }
+
+                else {
+                    console.log('Error')
+                }
+            })
+            .catch(err => console.log(err))
      }
 }
 
-function getRooms() {
-    fetch(`http://127.0.0.1:3001/rooms`)
+function getRooms(endpoint='rooms') {
+    fetch(`http://127.0.0.1:3001/${endpoint}`)
         .then(res => res.json())
         .then(data => {
             const result = data.result
@@ -285,7 +374,7 @@ function getRooms() {
                             <td>
                                 <img onclick="popup(${i})" src="./../../assets/icon-settings.svg" />
                                 <div class='hide'>
-                                    <p onclick="editRoom(${i}, ${room.id})">Edit</p>
+                                    <p onclick="editRoom(${i}, ${room.id}, '${room.name}')">Edit</p>
                                     <a href='/pages/dashboard/tambah-penerima-akses.html?r=${room.name}&i=${room.id}'><p>Tambah Penerima Akses</p></a>
                                     <p onclick="deleteRoom(${room.id})">Hapus</p>
                                 </div>
@@ -312,7 +401,8 @@ function addRoom() {
     const name = document.querySelector('input').value
 
     if (!name) {
-        alert('Silahkan input nama ruangan baru!')
+        // alert('Silahkan input nama ruangan baru!')
+        popMessage('alert', 'Silahkan input nama ruangan baru!')
     }
 
     else {
@@ -321,12 +411,20 @@ function addRoom() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name })
         })
-        .then(res => res.ok ? window.location.reload() : console.log('Error'))
+        .then(res => {
+            if (res.ok) {
+                document.querySelector('tbody').remove()
+                document.querySelector('table').insertAdjacentHTML('beforeend', '<tbody></tbody>')
+
+                popMessage('success', 'Data ruangan berhasil ditambahkan.')
+                getRooms()
+            }
+        })
         .catch(err => console.log(err))                
     }
 }
 
-function editRoom(row_id, rid) {
+function editRoom(row_id, rid, rname) {
     const tr = document.querySelectorAll('tr')
     
     for (let i = 1; i < tr.length; i++) {
@@ -340,7 +438,7 @@ function editRoom(row_id, rid) {
     element.innerHTML = `
         <tr>
             <td>${row_id}</td>
-            <td><input name="nameInput" type="text" placeholder="" class="tableInput"/></td>
+            <td><input name="nameInput" type="text" value='${rname}' class="tableInput"/></td>
             <td><button class="btn btnGreen tableInput" onclick="updateRoom(${rid})">Simpan</button</td>
             <td><button class="btn btnRed tableInput" onclick="window.location.reload()">Batal</button</td>
             <td></td>
@@ -356,20 +454,95 @@ function updateRoom(rid) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name })
     })
-    .then(res => res.ok ? window.location.reload() : console.log('Error'))
+    .then(res => {
+        if (res.ok) {
+            document.querySelector('tbody').remove()
+            document.querySelector('table').insertAdjacentHTML('beforeend', '<tbody></tbody>')
+
+            popMessage('success', 'Data ruangan berhasil diperbarui.')
+            getRooms()
+        }
+
+        else {
+            console.log('Error')
+        }
+    })
     .catch(err => console.log(err))
 }
 
 function deleteRoom(rid) {
      if (confirm('Hapus data ini?')) {
          fetch(`http://127.0.0.1:3001/rooms/${rid}`, { method: 'DELETE' })
-             .then(res => res.ok ? window.location.reload() : console.log('Error'))
+             .then(res => {
+                if (res.ok) {
+                    document.querySelector('tbody').remove()
+                    document.querySelector('table').insertAdjacentHTML('beforeend', '<tbody></tbody>')
+
+                    popMessage('success', 'Data ruangan berhasil dihapus.')
+                    getRooms()
+                }
+
+                else {
+                    console.log('Error')
+                }
+             })
              .catch(err => console.log(err))
      }
 }
 
-function getReport() {
-    fetch('http://127.0.0.1:3001/attendance')
+function getRoomOptions() {
+    try {
+        fetch(`http://127.0.0.1:3001/rooms`)
+            .then(res => res.json())
+            .then(data => {
+                const result = data.result
+
+                if (result.length === 0) {
+                    const markup = `<option></option>`
+                    document.querySelector('select').insertAdjacentHTML('beforeend', markup)
+                }
+
+                else {
+                    result.forEach(room => {
+                        const markup = `<option id="${room.id}" value="${room.name}">${room.name}</option>`
+                        document.querySelector('select').insertAdjacentHTML('beforeend', markup)
+                    })
+                }
+            })
+        
+        getReport()
+    } catch(err) {
+        console.log(err)
+    }
+}
+
+function filterReport(e) {
+    e.preventDefault()
+    const rid = document.querySelector('select').selectedOptions[0].id
+    const date = document.getElementById('date-select').value == '' ? 0 : document.getElementById('date-select').value
+
+    if (rid == 0 && date == 0) {
+        popMessage('alert', 'Silahkan pilih ruangan dan/atau tanggal!')
+    }
+
+    else {
+        document.querySelector('tbody').remove()
+        document.querySelector('table').insertAdjacentHTML('beforeend', '<tbody></tbody>')
+
+        getReport(rid, date)
+    }
+
+    // console.log(`${rid} (${typeof(rid)}) ${date} (${typeof(date)})`)
+
+    // let select = document.querySelector('select')
+    
+    // while (select.firstChild) {
+    //     select.removeChild(select.firstChild)
+    // }
+}
+
+function getReport(rid=0, date=0) {
+    fetch(`http://127.0.0.1:3001/attendance?rid=${rid}&date=${date}`)
         .then(res => res.json())
         .then(data => {
             const result = data.result
@@ -405,37 +578,38 @@ function getReport() {
 
 function getUserOptions() {
     try {
-        var url_string = (window.location.href)
-        var url = new URL(url_string)
-        var rname = url.searchParams.get('r')
-        var rid = url.searchParams.get('i')
+        let url_string = (window.location.href)
+        let url = new URL(url_string)
+        let rname = url.searchParams.get('r')
+        let rid = url.searchParams.get('i')
         
         document.querySelector('span').innerText = rname
 
         const btn = document.getElementById('tambah-akses')
         btn.setAttribute('onclick', `addPermission(${rid})`)
+
+        fetch(`http://127.0.0.1:3001/permissions/ulist/${rid}`)
+            .then(res => res.json())
+            .then(data => {
+                const result = data.result
+                
+                if (result.length === 0) {
+                    const markup = `<option></option>`
+                    document.querySelector('select').insertAdjacentHTML('beforeend', markup)
+                }
+
+                else {
+                    result.forEach(user => {
+                        const markup = `<option id="${user.id}"" value="${user.name}">${user.name}</option>`
+                        document.querySelector('select').insertAdjacentHTML('beforeend', markup)
+                    })
+                }
+            })
+        
         getPermissions(rid)
     } catch(err) {
         console.log(err)
     }
-
-    fetch('http://127.0.0.1:3001/users')
-        .then(res => res.json())
-        .then(data => {
-            const result = data.result
-            
-            if (result.length === 0) {
-                const markup = `<option></option>`
-                document.querySelector('select').insertAdjacentHTML('beforeend', markup)
-            }
-
-            else {
-                result.forEach(user => {
-                    const markup = `<option id="${user.id}"" value="${user.name}">${user.name}</option>`
-                    document.querySelector('select').insertAdjacentHTML('beforeend', markup)
-                })
-            }
-        })
 }
 
 function getPermissions(rid) {
@@ -463,7 +637,7 @@ function getPermissions(rid) {
                             <td>${user.user_name.name}</td>
                             <td>${(user.createdAt).slice(0, 10)}</td>
                             <td>
-                                <img onclick="deletePermission(${user.id})" src="./../../assets/icon-settings.svg" />
+                                <img onclick="deletePermission(${user.id})" src="./../../assets/icon-trash.svg" />
                             </td>
                         </tr>
                     `
@@ -485,7 +659,7 @@ function getPermissions(rid) {
 
 function addPermission(room_id) {
     const user_id = document.querySelector('select').selectedOptions[0].id
-    console.log(user_id)
+    // console.log(user_id)
     
     if (user_id != 0) {
         fetch('http://127.0.0.1:3001/permissions', {
@@ -493,19 +667,58 @@ function addPermission(room_id) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ user_id, room_id })
         })
-        .then(res => res.ok ? window.location.reload() : console.log('Error'))
+        .then(res => {
+            if (res.ok) {
+                popMessage('success', 'Izin akses berhasil ditambahkan.')
+
+                document.querySelector('tbody').remove()
+                document.querySelector('table').insertAdjacentHTML('beforeend', '<tbody></tbody>')
+
+                let options = document.querySelectorAll('option')
+    
+                for (let i = 1; i < options.length; i++) {
+                    options[i].remove()
+                }
+
+                getUserOptions()
+            }
+
+            else {
+                console.log('Error')
+            }
+        })
         .catch(err => console.log(err))                
     }
 
     else {
-        alert('Silahkan pilih user penerima akses terlebih dahulu!')
+        // alert('Silahkan pilih user penerima akses terlebih dahulu!')
+        popMessage('alert', 'Silahkan pilih user terlebih dahulu!')
     }
 }
 
 function deletePermission(pid) {
      if (confirm('Hapus data ini?')) {
          fetch(`http://127.0.0.1:3001/permissions/${pid}`, { method: 'DELETE' })
-             .then(res => res.ok ? window.location.reload() : console.log('Error'))
+             .then(res => {
+                if (res.ok) {
+                    popMessage('success', 'Izin akses berhasil dihapus.')
+
+                    document.querySelector('tbody').remove()
+                    document.querySelector('table').insertAdjacentHTML('beforeend', '<tbody></tbody>')
+
+                    let options = document.querySelectorAll('option')
+    
+                    for (let i = 1; i < options.length; i++) {
+                        options[i].remove()
+                    }
+
+                    getUserOptions()
+                }
+
+                else {
+                    console.log('Error')
+                }
+             })
              .catch(err => console.log(err))
      }
 }
@@ -518,6 +731,10 @@ function getSummary() {
             document.querySelector('p#r').innerText = data.result.rooms
             document.querySelector('p#a').innerText = data.result.attendances
         })
+}
+
+function reset() {
+    window.location.reload()
 }
 
 function checkBeforeLogin() {
@@ -555,6 +772,7 @@ function login(e) {
         })
         .then(res => res.json())
         .then(data => {
+            localStorage.setItem('n', data.uname)
             localStorage.setItem('t', data.token)
             window.location.replace('http://127.0.0.1:5500/pages/dashboard')
         })
@@ -582,9 +800,9 @@ function init(p) {
                 break;
             case 'r': getRooms()
                 break;
-            case 're': getReport()
+            case 're': getRoomOptions() //get report
                 break;
-            case 'a': getUserOptions()
+            case 'a': getUserOptions() //get permissions
                 break;
             case 'i': setCurrentLabel()
                 break;

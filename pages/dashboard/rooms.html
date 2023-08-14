@@ -14,8 +14,15 @@
         <p class="title">DATA RUANGAN</p>
 
         <div class="single-form">
-            <input type="text" placeholder="Masukkan nama ruangan baru . . ."/>
-            <input class="btn btnGreen" type="submit" value="Tambah Data" onclick="addRoom()"/>
+            <div>
+                <input type="text" placeholder="Masukkan nama ruangan baru . . ."/>
+                <input class="btn btnGreen" type="submit" value="Tambah Data" onclick="addRoom()"/>
+            </div>
+
+            <div class="search-container">
+                <input id="search-input" type="text" placeholder="Cari berdasarkan nama. . ." value="" />
+                <img class="img-search" src="./../../assets/icon-search.svg" onclick="findData(event, 'room')" />
+            </div>
         </div>
 
         <table>

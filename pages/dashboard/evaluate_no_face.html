@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./../../style/style.css" />
+    <title>Face Recognition App</title>
+
+    <!-- <script defer src="./../../script/script-dashboard.js"></script> -->
+    <!-- <script defer type="module" src="./../../script/script-model.js"></script> -->
+</head>
+<body>
+    <!-- <button onclick="evaluate()">Evaluate</button> -->
+    <!-- Untuk cek atau testing model, liat confusion matrix juga di sini bisa -->
+
+    <!-- <div id="originalImages"></div>
+
+    <div id="landmarks"></div>
+
+    <div id="descriptors"></div> -->
+
+    <img src="./../../img_100/000001.jpg" />
+    <img src="./../../img_100/000002.jpg" />
+    <img src="./../../img_100/000003.jpg" />
+    <img src="./../../img_100/000004.jpg" />
+    <img src="./../../img_100/000005.jpg" />
+    <img src="./../../img_100/000006.jpg" />
+    <img src="./../../img_100/000007.jpg" />
+    <img src="./../../img_100/000008.jpg" />
+    <img src="./../../img_100/000009.jpg" />
+    <img src="./../../img_100/000010.jpg" />
+    <img src="./../../img_100/000011.jpg" />
+    <img src="./../../img_100/000012.jpg" />
+    <img src="./../../img_100/000013.jpg" />
+    <img src="./../../img_100/000014.jpg" />
+    <img src="./../../img_100/000015.jpg" />
+    <img src="./../../img_100/000016.jpg" />
+    <img src="./../../img_100/000017.jpg" />
+    <img src="./../../img_100/000018.jpg" />
+    <img src="./../../img_100/000019.jpg" />
+    <img src="./../../img_100/000020.jpg" />
+    <img src="./../../img_100/000021.jpg" />
+    <img src="./../../img_100/000022.jpg" />
+    <img src="./../../img_100/000023.jpg" />
+    <img src="./../../img_100/000024.jpg" />
+    <img src="./../../img_100/000025.jpg" />
+    <img src="./../../img_100/000026.jpg" />
+    <img src="./../../img_100/000027.jpg" />
+    <img src="./../../img_100/000028.jpg" />
+    <img src="./../../img_100/000029.jpg" />
+    <img src="./../../img_100/000030.jpg" />
+    <img src="./../../img_100/000031.jpg" />
+    <img src="./../../img_100/000032.jpg" />
+    <img src="./../../img_100/000033.jpg" />
+    <img src="./../../img_100/000034.jpg" />
+    <img src="./../../img_100/000035.jpg" />
+    <img src="./../../img_100/000036.jpg" />
+    <img src="./../../img_100/000037.jpg" />
+    <img src="./../../img_100/000038.jpg" />
+    <img src="./../../img_100/000039.jpg" />
+    <img src="./../../img_100/000040.jpg" />
+    <img src="./../../img_100/000041.jpg" />
+    <img src="./../../img_100/000042.jpg" />
+    <img src="./../../img_100/000043.jpg" />
+    <img src="./../../img_100/000044.jpg" />
+    <img src="./../../img_100/000045.jpg" />
+    <img src="./../../img_100/000046.jpg" />
+    <img src="./../../img_100/000047.jpg" />
+    <img src="./../../img_100/000048.jpg" />
+    <img src="./../../img_100/000049.jpg" />
+    <img src="./../../img_100/000050.jpg" />
+    <!-- <img src="./../../img_100/000051.jpg" />
+    <img src="./../../img_100/000052.jpg" />
+    <img src="./../../img_100/000053.jpg" />
+    <img src="./../../img_100/000054.jpg" />
+    <img src="./../../img_100/000055.jpg" />
+    <img src="./../../img_100/000056.jpg" />
+    <img src="./../../img_100/000057.jpg" />
+    <img src="./../../img_100/000058.jpg" />
+    <img src="./../../img_100/000059.jpg" />
+    <img src="./../../img_100/000060.jpg" />
+    <img src="./../../img_100/000061.jpg" />
+    <img src="./../../img_100/000062.jpg" />
+    <img src="./../../img_100/000063.jpg" />
+    <img src="./../../img_100/000064.jpg" />
+    <img src="./../../img_100/000065.jpg" />
+    <img src="./../../img_100/000066.jpg" />
+    <img src="./../../img_100/000067.jpg" />
+    <img src="./../../img_100/000068.jpg" />
+    <img src="./../../img_100/000069.jpg" />
+    <img src="./../../img_100/000070.jpg" />
+    <img src="./../../img_100/000071.jpg" />
+    <img src="./../../img_100/000072.jpg" />
+    <img src="./../../img_100/000073.jpg" />
+    <img src="./../../img_100/000074.jpg" />
+    <img src="./../../img_100/000075.jpg" />
+    <img src="./../../img_100/000076.jpg" />
+    <img src="./../../img_100/000077.jpg" />
+    <img src="./../../img_100/000078.jpg" />
+    <img src="./../../img_100/000079.jpg" />
+    <img src="./../../img_100/000080.jpg" />
+    <img src="./../../img_100/000081.jpg" />
+    <img src="./../../img_100/000082.jpg" />
+    <img src="./../../img_100/000083.jpg" />
+    <img src="./../../img_100/000084.jpg" />
+    <img src="./../../img_100/000085.jpg" />
+    <img src="./../../img_100/000086.jpg" />
+    <img src="./../../img_100/000087.jpg" />
+    <img src="./../../img_100/000088.jpg" />
+    <img src="./../../img_100/000089.jpg" />
+    <img src="./../../img_100/000090.jpg" />
+    <img src="./../../img_100/000091.jpg" />
+    <img src="./../../img_100/000092.jpg" />
+    <img src="./../../img_100/000093.jpg" />
+    <img src="./../../img_100/000094.jpg" />
+    <img src="./../../img_100/000095.jpg" />
+    <img src="./../../img_100/000096.jpg" />
+    <img src="./../../img_100/000097.jpg" />
+    <img src="./../../img_100/000098.jpg" />
+    <img src="./../../img_100/000099.jpg" />
+    <img src="./../../img_100/000100.jpg" /> -->
+
+    <!-- <img src="./../../img_100/000101.jpg" />
+    <img src="./../../img_100/000102.jpg" />
+    <img src="./../../img_100/000103.jpg" />
+    <img src="./../../img_100/000104.jpg" />
+    <img src="./../../img_100/000105.jpg" />
+    <img src="./../../img_100/000106.jpg" />
+    <img src="./../../img_100/000107.jpg" />
+    <img src="./../../img_100/000108.jpg" />
+    <img src="./../../img_100/000109.jpg" />
+    <img src="./../../img_100/000110.jpg" />
+    <img src="./../../img_100/000111.jpg" />
+    <img src="./../../img_100/000112.jpg" />
+    <img src="./../../img_100/000113.jpg" />
+    <img src="./../../img_100/000114.jpg" />
+    <img src="./../../img_100/000115.jpg" />
+    <img src="./../../img_100/000116.jpg" />
+    <img src="./../../img_100/000117.jpg" />
+    <img src="./../../img_100/000118.jpg" />
+    <img src="./../../img_100/000119.jpg" />
+    <img src="./../../img_100/000120.jpg" />
+    <img src="./../../img_100/000121.jpg" />
+    <img src="./../../img_100/000122.jpg" />
+    <img src="./../../img_100/000123.jpg" />
+    <img src="./../../img_100/000124.jpg" />
+    <img src="./../../img_100/000125.jpg" />
+    <img src="./../../img_100/000126.jpg" />
+    <img src="./../../img_100/000127.jpg" />
+    <img src="./../../img_100/000128.jpg" />
+    <img src="./../../img_100/000129.jpg" />
+    <img src="./../../img_100/000130.jpg" />
+    <img src="./../../img_100/000131.jpg" />
+    <img src="./../../img_100/000132.jpg" />
+    <img src="./../../img_100/000133.jpg" />
+    <img src="./../../img_100/000134.jpg" />
+    <img src="./../../img_100/000135.jpg" />
+    <img src="./../../img_100/000136.jpg" />
+    <img src="./../../img_100/000137.jpg" />
+    <img src="./../../img_100/000138.jpg" />
+    <img src="./../../img_100/000139.jpg" />
+    <img src="./../../img_100/000140.jpg" />
+    <img src="./../../img_100/000141.jpg" />
+    <img src="./../../img_100/000142.jpg" />
+    <img src="./../../img_100/000143.jpg" />
+    <img src="./../../img_100/000144.jpg" />
+    <img src="./../../img_100/000145.jpg" />
+    <img src="./../../img_100/000146.jpg" />
+    <img src="./../../img_100/000147.jpg" />
+    <img src="./../../img_100/000148.jpg" />
+    <img src="./../../img_100/000149.jpg" />
+    <img src="./../../img_100/000150.jpg" />
+    <img src="./../../img_100/000151.jpg" />
+    <img src="./../../img_100/000152.jpg" />
+    <img src="./../../img_100/000153.jpg" />
+    <img src="./../../img_100/000154.jpg" />
+    <img src="./../../img_100/000155.jpg" />
+    <img src="./../../img_100/000156.jpg" />
+    <img src="./../../img_100/000157.jpg" />
+    <img src="./../../img_100/000158.jpg" />
+    <img src="./../../img_100/000159.jpg" />
+    <img src="./../../img_100/000160.jpg" />
+    <img src="./../../img_100/000161.jpg" />
+    <img src="./../../img_100/000162.jpg" />
+    <img src="./../../img_100/000163.jpg" />
+    <img src="./../../img_100/000164.jpg" />
+    <img src="./../../img_100/000165.jpg" />
+    <img src="./../../img_100/000166.jpg" />
+    <img src="./../../img_100/000167.jpg" />
+    <img src="./../../img_100/000168.jpg" />
+    <img src="./../../img_100/000169.jpg" />
+    <img src="./../../img_100/000170.jpg" />
+    <img src="./../../img_100/000171.jpg" />
+    <img src="./../../img_100/000172.jpg" />
+    <img src="./../../img_100/000173.jpg" />
+    <img src="./../../img_100/000174.jpg" />
+    <img src="./../../img_100/000175.jpg" />
+    <img src="./../../img_100/000176.jpg" />
+    <img src="./../../img_100/000177.jpg" />
+    <img src="./../../img_100/000178.jpg" />
+    <img src="./../../img_100/000179.jpg" />
+    <img src="./../../img_100/000180.jpg" />
+    <img src="./../../img_100/000181.jpg" />
+    <img src="./../../img_100/000182.jpg" />
+    <img src="./../../img_100/000183.jpg" />
+    <img src="./../../img_100/000184.jpg" />
+    <img src="./../../img_100/000185.jpg" />
+    <img src="./../../img_100/000186.jpg" />
+    <img src="./../../img_100/000187.jpg" />
+    <img src="./../../img_100/000188.jpg" />
+    <img src="./../../img_100/000189.jpg" />
+    <img src="./../../img_100/000190.jpg" />
+    <img src="./../../img_100/000191.jpg" />
+    <img src="./../../img_100/000192.jpg" />
+    <img src="./../../img_100/000193.jpg" />
+    <img src="./../../img_100/000194.jpg" />
+    <img src="./../../img_100/000195.jpg" />
+    <img src="./../../img_100/000196.jpg" />
+    <img src="./../../img_100/000197.jpg" />
+    <img src="./../../img_100/000198.jpg" />
+    <img src="./../../img_100/000199.jpg" />
+    <img src="./../../img_100/000200.jpg" />
+
+    <img src="./../../img_100/000201.jpg" />
+    <img src="./../../img_100/000202.jpg" />
+    <img src="./../../img_100/000203.jpg" />
+    <img src="./../../img_100/000204.jpg" />
+    <img src="./../../img_100/000205.jpg" />
+    <img src="./../../img_100/000206.jpg" />
+    <img src="./../../img_100/000207.jpg" />
+    <img src="./../../img_100/000208.jpg" />
+    <img src="./../../img_100/000209.jpg" />
+    <img src="./../../img_100/000210.jpg" />
+    <img src="./../../img_100/000211.jpg" />
+    <img src="./../../img_100/000212.jpg" />
+    <img src="./../../img_100/000213.jpg" />
+    <img src="./../../img_100/000214.jpg" />
+    <img src="./../../img_100/000215.jpg" />
+    <img src="./../../img_100/000216.jpg" />
+    <img src="./../../img_100/000217.jpg" />
+    <img src="./../../img_100/000218.jpg" />
+    <img src="./../../img_100/000219.jpg" />
+    <img src="./../../img_100/000220.jpg" />
+    <img src="./../../img_100/000221.jpg" />
+    <img src="./../../img_100/000222.jpg" />
+    <img src="./../../img_100/000223.jpg" />
+    <img src="./../../img_100/000224.jpg" />
+    <img src="./../../img_100/000225.jpg" />
+    <img src="./../../img_100/000226.jpg" />
+    <img src="./../../img_100/000227.jpg" />
+    <img src="./../../img_100/000228.jpg" />
+    <img src="./../../img_100/000229.jpg" />
+    <img src="./../../img_100/000230.jpg" />
+    <img src="./../../img_100/000231.jpg" />
+    <img src="./../../img_100/000232.jpg" />
+    <img src="./../../img_100/000233.jpg" />
+    <img src="./../../img_100/000234.jpg" />
+    <img src="./../../img_100/000235.jpg" />
+    <img src="./../../img_100/000236.jpg" />
+    <img src="./../../img_100/000237.jpg" />
+    <img src="./../../img_100/000238.jpg" />
+    <img src="./../../img_100/000239.jpg" />
+    <img src="./../../img_100/000240.jpg" />
+    <img src="./../../img_100/000241.jpg" />
+    <img src="./../../img_100/000242.jpg" />
+    <img src="./../../img_100/000243.jpg" />
+    <img src="./../../img_100/000244.jpg" />
+    <img src="./../../img_100/000245.jpg" />
+    <img src="./../../img_100/000246.jpg" />
+    <img src="./../../img_100/000247.jpg" />
+    <img src="./../../img_100/000248.jpg" />
+    <img src="./../../img_100/000249.jpg" />
+    <img src="./../../img_100/000250.jpg" />
+    <img src="./../../img_100/000251.jpg" />
+    <img src="./../../img_100/000252.jpg" />
+    <img src="./../../img_100/000253.jpg" />
+    <img src="./../../img_100/000254.jpg" />
+    <img src="./../../img_100/000255.jpg" />
+    <img src="./../../img_100/000256.jpg" />
+    <img src="./../../img_100/000257.jpg" />
+    <img src="./../../img_100/000258.jpg" />
+    <img src="./../../img_100/000259.jpg" />
+    <img src="./../../img_100/000260.jpg" />
+    <img src="./../../img_100/000261.jpg" />
+    <img src="./../../img_100/000262.jpg" />
+    <img src="./../../img_100/000263.jpg" />
+    <img src="./../../img_100/000264.jpg" />
+    <img src="./../../img_100/000265.jpg" />
+    <img src="./../../img_100/000266.jpg" />
+    <img src="./../../img_100/000267.jpg" />
+    <img src="./../../img_100/000268.jpg" />
+    <img src="./../../img_100/000269.jpg" />
+    <img src="./../../img_100/000270.jpg" />
+    <img src="./../../img_100/000271.jpg" />
+    <img src="./../../img_100/000272.jpg" />
+    <img src="./../../img_100/000273.jpg" />
+    <img src="./../../img_100/000274.jpg" />
+    <img src="./../../img_100/000275.jpg" />
+    <img src="./../../img_100/000276.jpg" />
+    <img src="./../../img_100/000277.jpg" />
+    <img src="./../../img_100/000278.jpg" />
+    <img src="./../../img_100/000279.jpg" />
+    <img src="./../../img_100/000280.jpg" />
+    <img src="./../../img_100/000281.jpg" />
+    <img src="./../../img_100/000282.jpg" />
+    <img src="./../../img_100/000283.jpg" />
+    <img src="./../../img_100/000284.jpg" />
+    <img src="./../../img_100/000285.jpg" />
+    <img src="./../../img_100/000286.jpg" />
+    <img src="./../../img_100/000287.jpg" />
+    <img src="./../../img_100/000288.jpg" />
+    <img src="./../../img_100/000289.jpg" />
+    <img src="./../../img_100/000290.jpg" />
+    <img src="./../../img_100/000291.jpg" />
+    <img src="./../../img_100/000292.jpg" />
+    <img src="./../../img_100/000293.jpg" />
+    <img src="./../../img_100/000294.jpg" />
+    <img src="./../../img_100/000295.jpg" />
+    <img src="./../../img_100/000296.jpg" />
+    <img src="./../../img_100/000297.jpg" />
+    <img src="./../../img_100/000298.jpg" />
+    <img src="./../../img_100/000299.jpg" />
+    <img src="./../../img_100/000300.jpg" /> -->
+
+    <!-- <script src="./../../script/tf.min.js"></script> -->
+    <script src="./../../script/face-api.js"></script>
+    <script>
+        // let label = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        const MODEL_URL = './../../models'
+        
+        async function loadModel() {
+            await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+            await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL)
+            await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL)
+            console.log('Model loaded!')
+        }
+
+        async function firstInference() {
+            console.log('Start Inference')
+
+            let TN = 0
+            let FP = 0
+
+            const imgs = document.querySelectorAll('img')
+            const dataUrl = []
+
+            for (let i = 0; i < imgs.length; i++) {
+                const tempCanvas = document.createElement('canvas')
+                tempCanvas.width = imgs[i].width
+                tempCanvas.height = imgs[i].height
+                const tempCtx = tempCanvas.getContext('2d')
+
+                tempCtx.drawImage(imgs[i], 0, 0)
+                const url = tempCanvas.toDataURL()
+                dataUrl.push(url)
+            }
+
+            for (let i = 0; i < dataUrl.length; i++) {
+                const image = document.createElement('img')
+                image.src = dataUrl[i]
+                const detection = await faceapi.detectAllFaces(image)
+
+                if (!detection[0]) {
+                    console.log(`${i + 1} - No Face`)
+                    TN++
+                }
+
+                else {
+                    console.log(`${i + 1} - Face`)
+                    FP++
+                }
+            }
+
+            console.log('Total True Negative (TN) =', TN)
+            console.log('Total False Positive (FP) =', FP)
+            console.log('Inference done.')
+        }
+
+        async function init() {
+            await loadModel()
+            await firstInference()
+        }
+
+        init()
+    </script>
+</body>
+</html>
