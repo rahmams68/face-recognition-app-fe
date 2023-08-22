@@ -11,6 +11,7 @@
     <script defer src="./../script/script.js"></script>
 </head>
 <body class="app">
+    <a class="a-login" onclick="getDescriptors()">Update</a>
     <!-- <a class="a-login" href="/pages/login.html">Login</a> -->
 
     <section id="main">
@@ -28,6 +29,7 @@
             <div class="cam-container">
                 <p id="date"></p>
                 <canvas id="detectionCanvas" width="320" height="240"></canvas>
+                <!-- <button onclick="accessRoom('masuk')" class="btn btnGreen">Masuk</button> -->
                 <button onclick="enterRoom()" class="btn btnGreen">Masuk</button>
             </div>
 
@@ -36,6 +38,7 @@
                 <div>
                     <ul id="att-list"></ul>
                 </div>
+                <!-- <button onclick="accessRoom('keluar')" class="btn btnRed">Keluar</button> -->
                 <button onclick="exitRoom()" class="btn btnRed">Keluar</button>
             </div>
         </div>
@@ -44,7 +47,9 @@
     <img id="firstImg" src="./../assets/00.jpg" />
     <img id="secondImg" src="./../assets/01.png" />
 
-    <div class="loader"></div>
+    <div class="loader">
+        <!-- <div class="loading-bar"></div> -->
+    </div>
     
     <!-- <div id="verificationPopup" class="verificationPopup">
         <div class="verificationBox appear">

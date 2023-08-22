@@ -126,16 +126,17 @@ async function getRoomAttendances() {
     const list = document.getElementById('att-list')
     const rid = localStorage.getItem('currRid')
 
-    fetch(`http://127.0.0.1:3001/attendance/${rid}`)
+    fetch(`http://127.0.0.1:3001/attendance?rid=${rid}&date=0`)
         .then(res => res.json())
         .then(data => {
             const result = data.result
+            console.log(result)
 
             if (result.length !== 0) {
                 result.forEach(data => {
-                    const date = `${data.date.slice(8, 10)}/${data.date.slice(5, 7)}/${data.date.slice(2, 4)}`
+                    const date = `${data.createdAt.slice(8, 10)}/${data.createdAt.slice(5, 7)}/${data.createdAt.slice(2, 4)}`
                     const markup = `
-                        <li>${data.username}</li>
+                        <li>${data.user_name.name}</li>
                         <li>${date} ${data.status ? "<span class='green'>>></span>" : "<span class='red'><<</span>"}</li>
                     `
                     list.insertAdjacentHTML('beforeend', markup)
@@ -144,15 +145,22 @@ async function getRoomAttendances() {
         })
 }
 
-async function getDescriptors() {
+function getDescriptors() {
+    ls.length = 0
+    ds.length = 0
+
     try {
-        fetch(`http://127.0.0.1:3001/model/descriptor`)
+        fetch(`http://127.0.0.1:3001/users/descriptor`)
             .then(res => res.json())
             .then(data => {
+                // console.log(data.result)
                 data.result.map(res => {
-                    ls.push(res.l)
-                    ds.push(res.d)
+                    ls.push(res.descriptor.l)
+                    ds.push(res.descriptor.d)
                 })
+
+                // console.log(ls)
+                // console.log(ds)
             })
     } catch(err) {console.log(err)}
 
@@ -197,13 +205,29 @@ function euclideanDistance(face1, face2) {
     return distance
 }
 
+function manhattanDistance(face1, face2) {
+    let distance = 0
+
+    if (face1.length != face2.length) {
+        console.log('Error')
+        return false
+    }
+
+    for (let i = 0; i < face1.length; i++) {
+        distance += Math.abs(face1[i] - face2[i])
+    }
+
+    return distance/10
+}
+
 function faceMatcher(face) {
     let results = []
 
     ds.map(d => {
         let temp = 0
         for (let i = 0; i < d.length; i++) {
-            temp += euclideanDistance(face, d[i])
+            temp += manhattanDistance(face, d[i])
+            // temp += euclideanDistance(face, d[i])
         }
         results.push(temp / d.length)
     })
@@ -244,10 +268,18 @@ function displayRoom(rid, rname) {
     container.removeAttribute('class')
 }
 
-function verificationPopup(name='Wajah tidak dikenal.', status) {
+function verificationPopup(name='Wajah tidak dikenal', status) {
     let div = document.createElement('div')
     div.setAttribute('id', 'verificationPopup')
     div.setAttribute('class', 'verificationPopup')
+
+    // let markup = `
+    //     <div class="verificationBox appear">
+    //         <p>${info[0]}</p>
+    //         <div class=${info[2] ? 'checklist' : 'not'}></div>
+    //         <p>${info[1]}</p>
+    //     </div>
+    // `
 
     let markup = `
         <div class="verificationBox appear">
@@ -297,11 +329,36 @@ function warningPopup(name, status) {
     }, 2000)
 }
 
+async function accessRoom(type) {
+    console.log(`Akses ${type}`)
+
+    const dataUrl = CANVAS.toDataURL('image/png')
+    const image = document.createElement('img')
+    image.src = dataUrl
+
+    const detection = await faceapi.detectAllFaces(image).withFaceLandmarks().withFaceDescriptors()
+
+    if (!detection[0]) {
+        console.log('Tidak ada wajah terdeteksi')
+    }
+
+    else {
+        fetch(`http://localhost:3001/users/descriptor`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type, descriptor: detection[0].descriptor, testDescriptor: detection })
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log(data)
+        })
+    }
+}
+
 async function enterRoom() {
     console.log('Masuk')
     
     const dataUrl = CANVAS.toDataURL('image/png')
-
     const image = document.createElement('img')
     image.src = dataUrl
 
@@ -311,35 +368,44 @@ async function enterRoom() {
         console.log('Tidak ada wajah terdeteksi.')
     }
 
-    else {        
-        let result = faceMatcher(detection[0].descriptor)
-        console.log(result)
-        
-        if (typeof(result) === 'string') {
-            verificationPopup(result.l, false)
+    else {
+        // await getDescriptors()
+        console.log(ls, ds)
+
+        if (ls.length === 0 && ds.length === 0) {
+            verificationPopup('Wajah tidak dikenal.', false)
         }
 
         else {
-            fetch(`http://127.0.0.1:3001/temp/${result.i}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.result.status === true) {
-                        if (data.result.rid != window.localStorage.getItem('currRid')) {
-                            warningPopup(result.l, true)
+            let result = faceMatcher(detection[0].descriptor)
+            console.log(result)
+            
+            if (typeof(result) === 'string') {
+                verificationPopup(result.l, false)
+            }
+    
+            else {
+                fetch(`http://127.0.0.1:3001/temp/${result.i}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.result.status === true) {
+                            if (data.result.rid != window.localStorage.getItem('currRid')) {
+                                warningPopup(result.l, true)
+                            }
+    
+                            else {
+                                warningPopup(result.l, 'this')
+                            }
+                            console.log('WARNING! This user already in another room!')
                         }
-
+    
                         else {
-                            warningPopup(result.l, 'this')
+                            console.log('Ok, you can enter.')
+                            // verificationPopup(result.l, true)
+                            recordAttendance(result.i, result.l, true)
                         }
-                        console.log('WARNING! This user already in another room!')
-                    }
-
-                    else {
-                        console.log('Ok, you can enter.')
-                        // verificationPopup(result.l, true)
-                        recordAttendance(result.i, result.l, true)
-                    }
-                })
+                    })
+            }
         }
     }
 }
@@ -412,6 +478,7 @@ function backToHome() {
 }
 
 async function init() {
+    console.time('Initialization')
     await loadModel()
     await firstInference()
     getRooms()
@@ -427,9 +494,15 @@ async function init() {
     loader.setAttribute('class', 'loader loader-hidden')
     loader.addEventListener('transitionend', () => {
         loader.remove()
+        console.log('Loader disappear')
     })
+
+    console.timeEnd('Initialization')
     // console.log(faceapi)
     // console.log(faceapi.nets)
 }
 
 init()
+//34632ms
+//32877ms
+//34223ms

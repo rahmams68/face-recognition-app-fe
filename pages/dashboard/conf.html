@@ -33,9 +33,26 @@
         const imageUpload = document.getElementById('imageUpload')
         
         const descriptors = []
-        const labels = ['1', '3', '4', '5', '6', '7', '8', '10', '12', '13', '14', '15', '17', '18', '19']
+        // const labels = ['1', '3', '4', '5', '6', '7', '8', '10', '12', '13', '14', '15', '17', '18', '19']
         const MODEL_URL = './../../models'
         const THRESHOLD = 0.6
+        const confusion_matrix = []
+        const temp_distances = []
+
+        const id = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        const folder_name = ['1_1', '2_4', '3_6', '4_7', '5_12', '6_13', '7_14', '8_15', '9_17', '10_18']
+        const labels = [
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+            3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+            4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+            5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+            6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+            7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+            8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+            9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+            10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10
+        ]
         
         async function start() {
             const container = document.createElement('div')
@@ -79,6 +96,21 @@
             console.log('Model loaded!')
         }
 
+        function manhattanDistance(face1, face2) {
+            let distance = 0
+
+            if (face1.length != face2.length) {
+                console.log('Error')
+                return false
+            }
+
+            for (let i = 0; i < face1.length; i++) {
+                distance += Math.abs(face1[i] - face2[i])
+            }
+
+            return distance
+        }
+
         function euclideanDistance(face1, face2) {
             let distance = 0
 
@@ -97,12 +129,15 @@
         }
 
         function faceMatcher(face) {
+            console.time('faceMatching')
             let results = []
-
+            
             descriptors.map(d => {
+                let distances = []
                 let temp = 0
                 for (let i = 0; i < d['descriptors'].length; i++) {
                     temp += euclideanDistance(face, d['descriptors'][i])
+                    // temp += manhattanDistance(face, d['descriptors'][i])
                 }
                 results.push(temp / d['descriptors'].length)
             })
@@ -111,59 +146,44 @@
             const index = results.indexOf(min)
             console.log('Distance: ', min)
 
+            temp_distances.push(min)
+
             // if (min > THRESHOLD) {
             //     let message = 'Wajah tidak dikenal.'
             //     return message
             // }
 
             // else {
+                console.timeEnd('faceMatching')
                 return descriptors[index]['label']
             // }
         }
 
         async function loadLabeledImages() {
-            console.log('Load Images')
+            console.log('LOAD LABELED IMAGES')
 
-            for (let i = 0; i < labels.length; i++) {
+            for (let i = 0; i < id.length; i++) {
                 const descriptor = []
-                // console.log(labels[i])
+                // console.log(`ID: ${i+1}`)
 
-                // let num = 1
-                // let status = true
-
-                // do {
-                //     console.log(`${labels[i]}-${num}`)
-                //     const img = await faceapi.fetchImage(`../../labeled_images/${labels[i]}/${labels[i]}-${num}.jpg`) ? await faceapi.fetchImage(`../../labeled_images/${labels[i]}/${labels[i]}-${num}.jpg`) : false
-
-                //     if (img) {
-                //         num++
-                //     }
-
-                //     else {
-                //         status = false
-                //     }
-                // } while(status)
-
-                for (let j = 1; j <= 3; j++) {
-                    console.log(`${labels[i]}-${j}`)
-                    const img = await faceapi.fetchImage(`../../labeled_images/${labels[i]}/${labels[i]}-${j}.jpg`)
+                for (let j = 1; j <= 5; j++) {
+                    // console.log(`${folder_name[i]}/${j}.jpg`)
+                    const img = await faceapi.fetchImage(`../../labeled_images_new/${folder_name[i]}/${j}.jpg`)
                     const detection = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor()
 
-                    // console.log(detection)
-
                     if (!detection) {
-                        console.log('Tidak ada wajah terdeteksi.')
+                        console.log(`${folder_name[i]}/${j}.jpg - Tidak ada wajah terdeteksi.`)
                     }
 
                     else {
                         descriptor.push(detection.descriptor)
-                        console.log(detection.descriptor)
+                        // console.log(detection.descriptor)
                     }
 
                 }
 
                 descriptors.push({
-                    'label': labels[i],
+                    'label': id[i],
                     'descriptors': descriptor
                 })
             }
@@ -171,13 +191,221 @@
             console.log(descriptors)
         }
 
+        async function processConfusionMatrix() {
+            console.log('PROCESS CONFUSION MATRIX')
+
+            
+            for (let i = 0; i < id.length; i++) {
+                const arr = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                temp_distances.length = 0
+                console.log(`ID: ${i+1}`)
+
+                for (let j = 6; j <= 20; j++) {
+                    // console.log(`${folder_name[i]}/${j}.jpg`)
+                    // console.time('Face Detecting to Verifying')
+                    const img = await faceapi.fetchImage(`../../labeled_images_new/${folder_name[i]}/${j}.jpg`)
+                    
+                    // console.time('Face Detecting')
+                    const detection = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor()
+                    // console.timeEnd('Face Detecting')
+
+                    if (!detection) {
+                        console.log(`${folder_name[i]}/${j}.jpg - Tidak ada wajah terdeteksi.`)
+                    }
+    
+                    else {
+                        // console.time('faceMatching')
+                        const predictedId = faceMatcher(detection.descriptor)
+                        // console.timeEnd('faceMatching')
+
+                        arr[predictedId - 1]++
+    
+                        // if (predictedId === (i + 1)) {
+                        //     console.log(`${i+1} predicted as ${predictedId} TRUE`)
+                        // }
+    
+                        // else {
+                        //     console.log(`${i+1} predicted as ${predictedId} FALSE`)
+                        // }
+                        
+                    }
+                    // console.timeEnd('Face Detecting to Verifying')
+                }
+
+                const minDistance = Math.min(...temp_distances)
+                const maxDistance = Math.max(...temp_distances)
+                const avgDistance = () => {
+                    let total = 0
+                    temp_distances.map(val => { total += val })
+                    return total/temp_distances.length
+                }
+                
+                console.log(`Min: ${minDistance} - Max: ${maxDistance} - Avg: ${avgDistance()}`)
+                console.log(`ID ${i+1} PREDICTION RESULT: ${arr}`)
+                confusion_matrix.push(arr)
+            }
+
+            console.log(confusion_matrix)
+        }
+
         async function init() {
             await loadModel()
             await loadLabeledImages()
-            await start()
+            await processConfusionMatrix()
+            // await start()
         }
 
         init()
+    </script>
+    <script>
+        // const imageUpload = document.getElementById('imageUpload')
+        
+        // const descriptors = []
+        // const labels = ['1', '3', '4', '5', '6', '7', '8', '10', '12', '13', '14', '15', '17', '18', '19']
+        // const MODEL_URL = './../../models'
+        // const THRESHOLD = 0.6
+        
+        // async function start() {
+        //     const container = document.createElement('div')
+        //     container.style.position = 'relative'
+        //     document.body.append(container)
+        //     document.body.append('Loaded')
+
+        //     let image, canvas
+
+        //     imageUpload.addEventListener('change', async () => {
+        //         if (image) image.remove()
+        //         if (canvas) canvas.remove()
+    
+        //         image = await faceapi.bufferToImage(imageUpload.files[0])
+        //         container.append(image)
+
+        //         canvas = faceapi.createCanvasFromMedia(image)
+        //         container.append(canvas)
+
+        //         const displaySize = { width: image.width, height: image.height }
+        //         faceapi.matchDimensions(canvas, displaySize)
+
+        //         const detections = await faceapi.detectAllFaces(image).withFaceLandmarks().withFaceDescriptors()
+
+        //         if (!detections[0]) {
+        //             console.log('Tidak ada wajah terdeteksi.')
+        //         }
+
+        //         else {
+        //             console.log('Wajah terdeteksi.')
+        //             let result = faceMatcher(detections[0].descriptor)
+        //             console.log('RESULT:', result)
+        //         }
+        //     })
+        // }
+        
+        // async function loadModel() {
+        //     await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+        //     await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL)
+        //     await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL)
+        //     console.log('Model loaded!')
+        // }
+
+        // function euclideanDistance(face1, face2) {
+        //     let distance = 0
+
+        //     if (face1.length != face2.length) {
+        //         console.log('Error')
+        //         return false
+        //     }
+
+        //     for (let i = 0; i < face1.length; i++) {
+        //         distance += (face1[i] - face2[i]) ** 2
+        //     }
+
+        //     distance **= 0.5
+
+        //     return distance
+        // }
+
+        // function faceMatcher(face) {
+        //     let results = []
+
+        //     descriptors.map(d => {
+        //         let temp = 0
+        //         for (let i = 0; i < d['descriptors'].length; i++) {
+        //             temp += euclideanDistance(face, d['descriptors'][i])
+        //         }
+        //         results.push(temp / d['descriptors'].length)
+        //     })
+
+        //     const min = Math.min(...results)
+        //     const index = results.indexOf(min)
+        //     console.log('Distance: ', min)
+
+        //     // if (min > THRESHOLD) {
+        //     //     let message = 'Wajah tidak dikenal.'
+        //     //     return message
+        //     // }
+
+        //     // else {
+        //         return descriptors[index]['label']
+        //     // }
+        // }
+
+        // async function loadLabeledImages() {
+        //     console.log('Load Images')
+
+        //     for (let i = 0; i < labels.length; i++) {
+        //         const descriptor = []
+        //         // console.log(labels[i])
+
+        //         // let num = 1
+        //         // let status = true
+
+        //         // do {
+        //         //     console.log(`${labels[i]}-${num}`)
+        //         //     const img = await faceapi.fetchImage(`../../labeled_images/${labels[i]}/${labels[i]}-${num}.jpg`) ? await faceapi.fetchImage(`../../labeled_images/${labels[i]}/${labels[i]}-${num}.jpg`) : false
+
+        //         //     if (img) {
+        //         //         num++
+        //         //     }
+
+        //         //     else {
+        //         //         status = false
+        //         //     }
+        //         // } while(status)
+
+        //         for (let j = 1; j <= 3; j++) {
+        //             console.log(`${labels[i]}-${j}`)
+        //             const img = await faceapi.fetchImage(`../../labeled_images/${labels[i]}/${labels[i]}-${j}.jpg`)
+        //             const detection = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor()
+
+        //             // console.log(detection)
+
+        //             if (!detection) {
+        //                 console.log('Tidak ada wajah terdeteksi.')
+        //             }
+
+        //             else {
+        //                 descriptor.push(detection.descriptor)
+        //                 console.log(detection.descriptor)
+        //             }
+
+        //         }
+
+        //         descriptors.push({
+        //             'label': labels[i],
+        //             'descriptors': descriptor
+        //         })
+        //     }
+
+        //     console.log(descriptors)
+        // }
+
+        // async function init() {
+        //     await loadModel()
+        //     await loadLabeledImages()
+        //     await start()
+        // }
+
+        // init()
     </script>
 </body>
 </html>

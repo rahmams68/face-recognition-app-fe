@@ -381,6 +381,25 @@ ul li {
     cursor: pointer;
 }
 
+.instruction {
+    background-color: var(--p-green);
+    background-color: #2AB29A33;
+    margin-top: 30px;
+    padding: 15px;
+    border-radius: 4px;
+}
+
+.instruction p {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.instruction ul li {
+    list-style: circle;
+    margin-left: 20px;
+    font-size: 14px;
+}
+
 .prev-container {
     position: relative;
     width: calc(100% - 320px);
@@ -624,6 +643,44 @@ tbody tr td.notFound {
     animation: loading 0.75s ease infinite;
 }
 
+.prev-container div.loading-bar {
+    width: 150px;
+    height: 16px;
+    border: 1px solid var(--p-green);
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: translateY(50px);
+    border-radius: 30px;
+    overflow: hidden;
+}
+
+.prev-container div.loading-bar::after {
+    content: '';
+    text-align: center;
+    position: absolute;
+    left: 0;
+    width: 1%;
+    height: 100%;
+    /* background-color: var(--p-green); */
+    background-image: linear-gradient(to left top, var(--p-green), #FFFFFF);
+    /* border-radius: 30px; */
+    animation: progress-bar 15s;
+    animation-fill-mode: forwards;
+}
+
+.prev-container div.loading-bar::before {
+    content: 'Loading';
+    position: absolute;
+    text-align: center;
+    font-size: 14px;
+    background: transparent;
+    animation: progress-bar-text 15s;
+    animation-fill-mode: forwards;
+    z-index: 1;
+}
+
 .mini-loader {
     position: absolute;
     z-index: 3;
@@ -651,6 +708,25 @@ tbody tr td.notFound {
     animation: loading 0.75s ease infinite;
 }
 
+.mini-loader p {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 10px;
+}
+
+/* .mini-loader::before {
+    content: '0%';
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 10px;
+    animation: progress-bar-text 30s;
+    animation-fill-mode: forwards;
+} */
+
 button.back {
     position: absolute;
     left: 60px;
@@ -674,6 +750,31 @@ button.back:hover {
     to {
         transform: rotate(360deg);
     }
+}
+
+@keyframes progress-bar {
+    100% {
+        width: 100%;
+    }
+}
+
+@keyframes progress-bar-text {
+    3% { content: '3%'; }
+    7% { content: '70%'; }
+    10% { content: '10%'; }
+    15% { content: '15%'; }
+    30% { content: '30%'; }
+    47% { content: '37%'; }
+    50% { content: '50%'; }
+    53% { content: '53%'; }
+    60% { content: '60%'; }
+    66% { content: '66%'; }
+    71% { content: '71%'; }
+    75% { content: '75%'; }
+    84% { content: '84%'; }
+    90% { content: '90%'; }
+    97% { content: '97%'; }
+    100% { content: '100%'; }
 }
 
 .verificationPopup {

@@ -80,8 +80,50 @@ function remove(e) {
     }
 }
 
+async function counter() {
+    console.log('Counter')
+    const num = document.querySelector('.num')
+    let counter = 0
+
+    setInterval(() => {
+        if (counter == 100) {
+            clearInterval()
+        }
+
+        else {
+            counter += 5
+            num.textContent = `${counter}%`
+        }
+    }, 10)
+}
+
 async function processImg() {
-    document.querySelector('div.prev-container').insertAdjacentHTML('afterbegin', '<div class="mini-loader"></div>')
+    console.time('Time')
+    document.querySelector('div.prev-container').insertAdjacentHTML('afterbegin', '<div class="mini-loader"><p class="num">0%</p></div>')
+    // counter()
+
+    const num = document.querySelector('.num')
+    let counter = 0
+
+    setInterval(() => {
+        if (counter == 100) {
+            const loader = document.querySelector('.mini-loader')
+            loader.setAttribute('class', 'mini-loader mini-loader-hidden')
+            loader.addEventListener('transitionend', () => {
+                loader.remove()
+            })
+            btnProcessImg.setAttribute('class', 'btn btnGreen')
+
+            clearInterval()
+        }
+
+        else {
+            counter += 5
+            num.textContent = `${counter}%`
+        }
+    }, 30)
+
+    // document.querySelector('div.prev-container').insertAdjacentHTML('afterbegin', '<div class="mini-loader"><div class="loading-bar"></div></div>')
     // btnTakePict.setAttribute('class', 'btnDisable')
     btnProcessImg.setAttribute('class', 'btnDisable')
 
@@ -99,18 +141,19 @@ async function processImg() {
     faceDescriptors = await loadLabeledImages()
     console.log(faceDescriptors)
 
-    const loader = document.querySelector('.mini-loader')
-    loader.setAttribute('class', 'mini-loader mini-loader-hidden')
-    loader.addEventListener('transitionend', () => {
-        loader.remove()
-    })
-    // btnTakePict.setAttribute('class', 'btn btnGreen')
-    btnProcessImg.setAttribute('class', 'btn btnGreen')
-    
-    fetch(`http://127.0.0.1:3001/model/descriptor`, {
-        method: 'POST',
+    console.timeEnd('Time')
+
+    // const loader = document.querySelector('.mini-loader')
+    // loader.setAttribute('class', 'mini-loader mini-loader-hidden')
+    // loader.addEventListener('transitionend', () => {
+    //     loader.remove()
+    // })
+    // btnProcessImg.setAttribute('class', 'btn btnGreen')
+
+    fetch(`http://127.0.0.1:3001/users/descriptor?uid=${uid}&action=add`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: uid, descriptor: faceDescriptors })
+        body: JSON.stringify({ descriptor: faceDescriptors })
     })
     .then(res => {
         if (res.ok) {
@@ -121,7 +164,7 @@ async function processImg() {
             }, 3500)
         }
     })
-    .then(res => res.ok ? window.location.href('/pages/dashboard/users.html') : console.log('Error'))
+    // // .then(res => res.ok ? window.location.href('/pages/dashboard/users.html') : console.log('Error'))
     .catch(err => console.log(err))
     // }
 }
@@ -180,8 +223,8 @@ function getUsers(endpoint='users') {
                         <tr id="${i}">
                             <td>${i}</td>
                             <td>${user.name}</td>
-                            <td>${user.training_data === true ? 'Lengkap' : 'Belum Lengkap'}</td>
-                            <td>${(user.createdAt).slice(0, 10)}</td>
+                            <td>${user.descriptor_count === 2 ? `Lengkap (${user.descriptor_count}/2)` : `Belum Lengkap (${user.descriptor_count}/2)`}</td>
+                            <td>${(user.updatedAt).slice(0, 10)}</td>
                             <td>
                                 <img onclick="popup(${i})" src="./../../assets/icon-settings.svg" />
                                 <div class='hide'>
@@ -250,7 +293,6 @@ function addUser(e) {
     const name = document.querySelector('input').value
     
     if (!name) {
-        // alert('Silahkan input nama user baru!')
         popMessage('alert', 'Silahkan input nama user baru!')
     }
 
@@ -259,7 +301,7 @@ function addUser(e) {
         fetch('http://127.0.0.1:3001/users', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, role_id: 0 })
+            body: JSON.stringify({ name })
         })
         .then(res => {
             if (res.ok) {
@@ -267,6 +309,7 @@ function addUser(e) {
                 document.querySelector('table').insertAdjacentHTML('beforeend', '<tbody></tbody>')
 
                 popMessage('success', 'User baru berhasil ditambahkan.')
+                document.querySelector('input').value = ''
                 getUsers()
                 
             }
@@ -304,7 +347,7 @@ function editUser(row_id, uid, uname) {
 function updateUser(uid) {
     const name = document.getElementsByName('nameInput')[0].value
 
-    fetch(`http://127.0.0.1:3001/users/${uid}`, {
+    fetch(`http://127.0.0.1:3001/users?uid=${uid}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name })
@@ -329,7 +372,7 @@ function deleteUser(e, uid) {
     e.preventDefault()
 
      if (confirm('Hapus data ini?')) {
-         fetch(`http://127.0.0.1:3001/users/${uid}`, { method: 'DELETE' })
+         fetch(`http://127.0.0.1:3001/users?uid=${uid}`, { method: 'DELETE' })
             .then(res => {
                 if (res.ok) {
                     document.querySelector('tbody').remove()
@@ -397,15 +440,16 @@ function getRooms(endpoint='rooms') {
         })
 }
 
-function addRoom() {
+function addRoom(e) {
     const name = document.querySelector('input').value
 
     if (!name) {
-        // alert('Silahkan input nama ruangan baru!')
         popMessage('alert', 'Silahkan input nama ruangan baru!')
     }
 
     else {
+        e.preventDefault()
+        
         fetch('http://127.0.0.1:3001/rooms', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -417,6 +461,7 @@ function addRoom() {
                 document.querySelector('table').insertAdjacentHTML('beforeend', '<tbody></tbody>')
 
                 popMessage('success', 'Data ruangan berhasil ditambahkan.')
+                document.querySelector('input').value
                 getRooms()
             }
         })
