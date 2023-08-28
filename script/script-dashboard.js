@@ -42,7 +42,6 @@ async function startCam() {
         
         btnStart.setAttribute('class', 'hide')
         btnTakePict.setAttribute('class', 'btn btnGreen')
-        // btnProcessImg.setAttribute('class', 'btn btnGreen')
     } catch(err) { console.log(err) }
 }
 
@@ -100,7 +99,6 @@ async function counter() {
 async function processImg() {
     console.time('Time')
     document.querySelector('div.prev-container').insertAdjacentHTML('afterbegin', '<div class="mini-loader"><p class="num">0%</p></div>')
-    // counter()
 
     const num = document.querySelector('.num')
     let counter = 0
@@ -123,32 +121,19 @@ async function processImg() {
         }
     }, 30)
 
-    // document.querySelector('div.prev-container').insertAdjacentHTML('afterbegin', '<div class="mini-loader"><div class="loading-bar"></div></div>')
-    // btnTakePict.setAttribute('class', 'btnDisable')
     btnProcessImg.setAttribute('class', 'btnDisable')
 
     if (!faceapi.nets.ssdMobilenetv1._params) {
-        // Promise.all([
         await faceapi.nets.faceRecognitionNet.loadFromUri(model_url)
         await faceapi.nets.faceLandmark68Net.loadFromUri(model_url)
         await faceapi.nets.ssdMobilenetv1.loadFromUri(model_url)
         console.log('Model loaded!')
-        // ])
-        // .then(console.log('Model loaded'))
     }
     
-    // else {
     faceDescriptors = await loadLabeledImages()
     console.log(faceDescriptors)
 
     console.timeEnd('Time')
-
-    // const loader = document.querySelector('.mini-loader')
-    // loader.setAttribute('class', 'mini-loader mini-loader-hidden')
-    // loader.addEventListener('transitionend', () => {
-    //     loader.remove()
-    // })
-    // btnProcessImg.setAttribute('class', 'btn btnGreen')
 
     fetch(`http://127.0.0.1:3001/users/descriptor?uid=${uid}&action=add`, {
         method: 'PUT',
@@ -166,7 +151,6 @@ async function processImg() {
     })
     // // .then(res => res.ok ? window.location.href('/pages/dashboard/users.html') : console.log('Error'))
     .catch(err => console.log(err))
-    // }
 }
 
 async function loadLabeledImages() {
@@ -223,7 +207,7 @@ function getUsers(endpoint='users') {
                         <tr id="${i}">
                             <td>${i}</td>
                             <td>${user.name}</td>
-                            <td>${user.descriptor_count === 2 ? `Lengkap (${user.descriptor_count}/2)` : `Belum Lengkap (${user.descriptor_count}/2)`}</td>
+                            <td>${user.descriptor_count === 3 ? `Lengkap (${user.descriptor_count}/3)` : `Belum Lengkap (${user.descriptor_count}/3)`}</td>
                             <td>${(user.updatedAt).slice(0, 10)}</td>
                             <td>
                                 <img onclick="popup(${i})" src="./../../assets/icon-settings.svg" />
@@ -576,14 +560,6 @@ function filterReport(e) {
 
         getReport(rid, date)
     }
-
-    // console.log(`${rid} (${typeof(rid)}) ${date} (${typeof(date)})`)
-
-    // let select = document.querySelector('select')
-    
-    // while (select.firstChild) {
-    //     select.removeChild(select.firstChild)
-    // }
 }
 
 function getReport(rid=0, date=0) {
@@ -662,6 +638,7 @@ function getPermissions(rid) {
         .then(res => res.json())
         .then(data => {
             const result = data.result
+            console.log(result)
 
             if (result.length === 0) {
                 const markup = `
@@ -704,7 +681,6 @@ function getPermissions(rid) {
 
 function addPermission(room_id) {
     const user_id = document.querySelector('select').selectedOptions[0].id
-    // console.log(user_id)
     
     if (user_id != 0) {
         fetch('http://127.0.0.1:3001/permissions', {
@@ -736,7 +712,6 @@ function addPermission(room_id) {
     }
 
     else {
-        // alert('Silahkan pilih user penerima akses terlebih dahulu!')
         popMessage('alert', 'Silahkan pilih user terlebih dahulu!')
     }
 }

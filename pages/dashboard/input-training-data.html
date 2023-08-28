@@ -17,9 +17,10 @@
         <div class="instruction">
             <p>Instruksi:</p>
             <ul>
-                <li>Silahkan buka kamera dan ambil gambar sebanyak dua kali sesuai dengan ketentuan pada poin kedua</li>
-                <li>(1) Wajah menghadap lurus ke kamera dengan ekspresi normal, (2) Wajah menoleh ke arah kanan dengan ekspresi tersenyum</li>
-                <li>(Lakukan pengambilan gambar dengan pengawasan admin)</li>
+                <li>Ambil gambar sebanyak tiga kali sesuai dengan ketentuan pada poin 2-4 (dengan pengawasan admin)</li>
+                <li>1 - Wajah menghadap lurus ke kamera dengan ekspresi normal</li>
+                <li>2 - Wajah menoleh ke arah kanan dengan ekspresi tersenyum (kedua mata harus terlihat)</li>
+                <li>3 - Wajah menoleh ke arah kiri, sedikit menunduk, dengan ekspresi tersenyum (kedua mata harus terlihat)</li>
             </ul>
         </div>
 
@@ -28,18 +29,11 @@
                 <video id="cam" width="320" height="240" playsinline autoplay muted></video>
                 <button id="btnStart" onclick="startCam()" class="btn btnGreen">Buka Kamera</button>
                 <button id="btnTakePict" onclick="takePicture()" class="hide">Ambil Gambar</button>
-                <!-- <button onclick="takePicture()" class="btn btnGrey">Ambil Gambar</button> -->
             </div>
 
             
             <div class="prev-container">
-                <!-- <div class="mini-loader">
-                    <p class="num">0%</p>
-                </div> -->
-                <div id="img-container" class="img-container">
-                    <!-- <p>Total: <span>0</span></p> -->
-                    <!-- <p>Preview</p> -->
-                </div>
+                <div id="img-container" class="img-container"></div>
                 <button id="btnProcessImg" onclick="processImg()" class="btnDisable">Proses</button>
             </div>
         </div>

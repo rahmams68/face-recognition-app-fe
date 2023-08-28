@@ -53,7 +53,6 @@ function startCam() {
     CANVAS = document.getElementById('detectionCanvas')
     CONTEXT = CANVAS.getContext('2d')
 
-    // let promise = navigator.mediaDevices.getUserMedia({ video: true })
     let promise = navigator.mediaDevices.getUserMedia({ video: { width: v_width, height: v_height } })
 
     promise.then(function(signal) {
@@ -153,14 +152,10 @@ function getDescriptors() {
         fetch(`http://127.0.0.1:3001/users/descriptor`)
             .then(res => res.json())
             .then(data => {
-                // console.log(data.result)
                 data.result.map(res => {
                     ls.push(res.descriptor.l)
                     ds.push(res.descriptor.d)
                 })
-
-                // console.log(ls)
-                // console.log(ds)
             })
     } catch(err) {console.log(err)}
 
@@ -227,7 +222,6 @@ function faceMatcher(face) {
         let temp = 0
         for (let i = 0; i < d.length; i++) {
             temp += manhattanDistance(face, d[i])
-            // temp += euclideanDistance(face, d[i])
         }
         results.push(temp / d.length)
     })
@@ -259,7 +253,6 @@ function displayRoom(rid, rname) {
     p.innerText = currentDate
 
     getRoomAttendances()
-    // startCam()
 
     const main = document.querySelector('section#main')
     main.setAttribute('class', 'hide')
@@ -272,14 +265,6 @@ function verificationPopup(name='Wajah tidak dikenal', status) {
     let div = document.createElement('div')
     div.setAttribute('id', 'verificationPopup')
     div.setAttribute('class', 'verificationPopup')
-
-    // let markup = `
-    //     <div class="verificationBox appear">
-    //         <p>${info[0]}</p>
-    //         <div class=${info[2] ? 'checklist' : 'not'}></div>
-    //         <p>${info[1]}</p>
-    //     </div>
-    // `
 
     let markup = `
         <div class="verificationBox appear">
@@ -401,7 +386,6 @@ async function enterRoom() {
     
                         else {
                             console.log('Ok, you can enter.')
-                            // verificationPopup(result.l, true)
                             recordAttendance(result.i, result.l, true)
                         }
                     })
@@ -449,14 +433,10 @@ async function exitRoom() {
 
                         else {
                             console.log('Ok, you can leave.')
-                            // verificationPopup(result.l, true)
                             recordAttendance(result.i, result.l, false)
                         }
                     }
                 })
-
-            // verificationPopup(result.l, true)
-            // recordAttendance(result.i, result.l, false)
         }
     }
 }
@@ -470,7 +450,6 @@ function backToHome() {
     const main = document.querySelector('section#main')
     const rooms = document.querySelector('section#rooms')
 
-    // localStorage.removeItem('currRid')
     getTemp()
 
     main.removeAttribute('class')
@@ -498,11 +477,6 @@ async function init() {
     })
 
     console.timeEnd('Initialization')
-    // console.log(faceapi)
-    // console.log(faceapi.nets)
 }
 
 init()
-//34632ms
-//32877ms
-//34223ms

@@ -11,6 +11,4 @@ function addNavbar() {
     document.body.insertAdjacentElement('afterbegin', nav)
 }
 
-{/* <a href="/pages/dashboard/model.html">RE-TRAINING MODEL</a> */}
-
 addNavbar()
